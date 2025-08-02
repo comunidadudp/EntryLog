@@ -6,6 +6,7 @@ namespace EntryLog.Entities.POCOEntities
     {
         public Guid Id { get; set; }
         public int Code { get; set; }
+        public string Name { get; set; } = "";
         public RoleType Role { get; set; }
         public string Email { get; set; } = "";
         public string CellPhone { get; set; } = "";
