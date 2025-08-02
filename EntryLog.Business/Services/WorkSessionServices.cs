@@ -5,7 +5,7 @@ using EntryLog.Business.QueryFilters;
 using EntryLog.Data.Interfaces;
 using EntryLog.Entities.Enums;
 using EntryLog.Entities.POCOEntities;
-using EntryLog_Business.Specs;
+using EntryLog.Business.Specs;
 
 namespace EntryLog.Business.Services
 {

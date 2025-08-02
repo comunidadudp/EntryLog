@@ -1,5 +1,6 @@
 ﻿using EntryLog.Business.DTOs;
 using EntryLog.Business.Interfaces;
+using EntryLog.Business.Mailtrap.Models;
 using EntryLog.Data.Interfaces;
 using EntryLog.Entities.POCOEntities;
 
@@ -92,7 +93,13 @@ namespace EntryLog.Business.Services
 
             await _userRepository.UpdateAsync(user);
 
-            bool isSend = await _emailSenderService.SendEmailWithTemplateAsync("RecoveryToken", user.Email);
+            var vars = new RecoveryAccountVariables
+            {
+                Name = user.Name,
+                Url = $"https://localhost:5000/account/recovery?token={recoveryToken}"
+            };
+
+            bool isSend = await _emailSenderService.SendEmailWithTemplateAsync("RecoveryToken", user.Email, vars);
 
             return (isSend, isSend ? $"Se ha enviado las instrucciones a tu cuenta {user.Email}" : "Ha ocurrido un error al enviar el correo");
         }
@@ -122,6 +129,7 @@ namespace EntryLog.Business.Services
             user = new AppUser
             {
                 Code = code,
+                Name = employee.FullName,
                 Role = Entities.Enums.RoleType.Employee,
                 Email = userDTO.Username,
                 CellPhone = userDTO.CellPhone,

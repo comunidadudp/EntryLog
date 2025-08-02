@@ -1,11 +1,8 @@
-﻿using EntryLog.Business.Interfaces;
+﻿using EntryLog.Business.Constants;
+using EntryLog.Business.Interfaces;
 using EntryLog.Business.Mailtrap.Models;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http.Json;
 
 namespace EntryLog.Business.Mailtrap
 {
@@ -16,9 +13,28 @@ namespace EntryLog.Business.Mailtrap
         private readonly IHttpClientFactory _clientFactory = clientFactory;
         private readonly MailtrapApiOptions _options = options.Value;
 
-        public Task<bool> SendEmailWithTemplateAsync(string templateName, string to, object? data = null)
+        public async Task<bool> SendEmailWithTemplateAsync(string templateName, string to, object? data = null)
         {
-            throw new NotImplementedException();
+            string templateUuid = _options.Templates.First(x => x.Name == templateName).Uuid;
+
+            using (var client = _clientFactory.CreateClient(ApiNames.MailtrapIO))
+            {
+                var body = new MailtrapRequestBody
+                {
+                    From = new From
+                    {
+                        Email = _options.FromEmail,
+                        Name = _options.FromName,
+                    },
+                    To = [new To { Email = to }],
+                    TemplateUuid = templateUuid,
+                    TemplateVariables = data,
+                };
+
+                var response = await client.PostAsJsonAsync<MailtrapRequestBody>("/api/send", body);
+
+                return response.IsSuccessStatusCode;
+            }
         }
     }
 }
