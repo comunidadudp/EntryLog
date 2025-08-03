@@ -2,7 +2,7 @@
 
 namespace EntryLog.Business.DTOs
 {
-    public record CreateJoSessionDTO(
+    public record CreateJobSessionDTO(
         string UserId,
         string Method,
         string DeviceName,
