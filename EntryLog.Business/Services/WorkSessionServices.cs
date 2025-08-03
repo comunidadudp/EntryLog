@@ -2,21 +2,24 @@
 using EntryLog.Business.Interfaces;
 using EntryLog.Business.Mappers;
 using EntryLog.Business.QueryFilters;
+using EntryLog.Business.Specs;
 using EntryLog.Data.Interfaces;
 using EntryLog.Entities.Enums;
 using EntryLog.Entities.POCOEntities;
-using EntryLog.Business.Specs;
+using Microsoft.AspNetCore.Http;
 
 namespace EntryLog.Business.Services
 {
     internal class WorkSessionServices(
         IEmployeeRepository employeeRepository,
         IAppUserRepository userRepository,
-        IWorkSessionRepository sessionRepository) : IWorkSessionServices
+        IWorkSessionRepository sessionRepository,
+        ILoadImagesService loadImagesService) : IWorkSessionServices
     {
         private readonly IEmployeeRepository _employeeRepository = employeeRepository;
         private readonly IAppUserRepository _userRepository = userRepository;
         private readonly IWorkSessionRepository _sessionRepository = sessionRepository;
+        private readonly ILoadImagesService _loadImagesService = loadImagesService;
 
         public async Task<(bool success, string message)> CloseJobSession(CloseJobSessionDTO sessionDTO)
         {
@@ -64,8 +67,19 @@ namespace EntryLog.Business.Services
             return sessions.Select(WorkSessionMapper.MapToGetWorkSessionDTO);
         }
 
+        public async Task<(bool success, string message)> ImageTestAsync(IFormFile image)
+        {
+            //Insercion de imagen
+            string filename = image.FileName;
+            string ext = Path.GetExtension(image.FileName);
 
-        public async Task<(bool success, string message)> OpenJobSession(CreateJoSessionDTO sessionDTO)
+            ImageBBResponseDTO imageBB = await _loadImagesService
+                .UploadAsync(image.OpenReadStream(), image.ContentType, filename, ext);
+
+            return (imageBB.Success, imageBB.Data.Url);
+        }
+
+        public async Task<(bool success, string message)> OpenJobSession(CreateJobSessionDTO sessionDTO)
         {
             int code = int.Parse(sessionDTO.UserId);
 
@@ -81,6 +95,13 @@ namespace EntryLog.Business.Services
             {
                 return (false, "El empleado tiene una sesiòn activa");
             }
+
+            //Insercion de imagen
+            string filename = sessionDTO.Image.FileName;
+            string ext = Path.GetExtension(sessionDTO.Image.FileName);
+
+            ImageBBResponseDTO imageBB = await _loadImagesService
+                .UploadAsync(sessionDTO.Image.OpenReadStream(), sessionDTO.Image.ContentType, filename, ext);
 
             //Crear la nueva sesion
             session = new WorkSession
@@ -98,7 +119,7 @@ namespace EntryLog.Business.Services
                         IpAddress = sessionDTO.IpAddress,
                     },
                     Notes = sessionDTO.Notes,
-                    PhotoUrl = ""
+                    PhotoUrl = imageBB.Data.Url
                 },
                 Status = SessionStatus.InProgress
             };

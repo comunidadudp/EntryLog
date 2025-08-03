@@ -1,5 +1,6 @@
 ﻿using EntryLog.Business.Constants;
 using EntryLog.Business.Cryptography;
+using EntryLog.Business.ImageBB;
 using EntryLog.Business.Interfaces;
 using EntryLog.Business.Mailtrap;
 using EntryLog.Business.Mailtrap.Models;
@@ -19,6 +20,7 @@ namespace EntryLog.Business
             services.Configure<Argon2PasswordHashOptions>(configuration.GetSection(nameof(Argon2PasswordHashOptions)));
             services.Configure<EncryptionKeyValues>(configuration.GetSection(nameof(EncryptionKeyValues)));
             services.Configure<MailtrapApiOptions>(configuration.GetSection(nameof(MailtrapApiOptions)));
+            services.Configure<ImageBBOptions>(configuration.GetSection(nameof(ImageBBOptions)));
 
             // HttpClientFactory
             services.AddHttpClient(ApiNames.MailtrapIO, (sp, client) =>
@@ -29,10 +31,19 @@ namespace EntryLog.Business
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiToken);
             });
 
+            //https://api.imgbb.com/1/upload?expiration=600&key=YOUR_CLIENT_API_KEY
+            services.AddHttpClient(ApiNames.ImageBB, (sp, client) =>
+            {
+                ImageBBOptions options = sp.GetRequiredService<IOptions<ImageBBOptions>>().Value;
+
+                client.BaseAddress = new Uri(options.ApiUrl);//https://api.imgbb.com
+            });
+
             // servicios de infraestructura
             services.AddScoped<IEmailSenderService, MailtrapApiService>();
             services.AddSingleton<IEncryptionService, RSAAsymmetricEncryptionService>();
             services.AddSingleton<IPasswordHasherService, Argon2PasswordHasherService>();
+            services.AddScoped<ILoadImagesService, ImageBBService>();
 
             // servicios de aplicación
             services.AddScoped<IAppUserServices, AppUserServices>();
