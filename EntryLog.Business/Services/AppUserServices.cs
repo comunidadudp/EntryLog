@@ -45,7 +45,7 @@ namespace EntryLog.Business.Services
 
             string username = parts[1];
 
-            AppUser user = await _userRepository.GetByRecoveryTokenAsync(recoveryTokenPlain);
+            AppUser user = await _userRepository.GetByRecoveryTokenAsync(recoveryDTO.Token);
             if (user == null || !string.Equals(username, user.Email, StringComparison.OrdinalIgnoreCase))
                 return (false, "Token inválido");
                 
