@@ -1,17 +1,15 @@
 ﻿using EntryLog.Business.DTOs;
 using EntryLog.Business.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace EntryLog.Api.Controllers
 {
-    [Route("api")]
+    [Route("api/account")]
     [ApiController]
-    public class TestController(
-        IAppUserServices appUserServices,
-        IWorkSessionServices workSessionServices) : ControllerBase
+    public class AccountController(
+        IAppUserServices appUserServices) : ControllerBase
     {
-        [HttpPost("user/register-employee-user")]
+        [HttpPost("register-employee-user")]
         public async Task<object> CreateUserEmployeeAsync([FromBody] CreateEmployeeUserDTO employeeUserDTO)
         {
             (bool success, string message, LoginResponseDTO? data) = await appUserServices.RegisterEmployeeAsync(employeeUserDTO);
@@ -24,10 +22,10 @@ namespace EntryLog.Api.Controllers
         }
 
 
-        [HttpPost("user/login")]
+        [HttpPost("login")]
         public async Task<object> UserLoginAsync([FromBody] UserCredentialsDTO credentialsDTO)
         {
-            (bool success,string message, LoginResponseDTO? data) = await appUserServices.UserLoginAsync(credentialsDTO);
+            (bool success, string message, LoginResponseDTO? data) = await appUserServices.UserLoginAsync(credentialsDTO);
             return Ok(new
             {
                 success,
@@ -36,7 +34,7 @@ namespace EntryLog.Api.Controllers
             });
         }
 
-        [HttpPost("user/recovery-start")]
+        [HttpPost("recovery-start")]
         public async Task<object> AccountRecoveryStartAsync([FromBody] string username)
         {
             (bool success, string message) = await appUserServices.AccountRecoveryStartAsync(username);
@@ -47,7 +45,7 @@ namespace EntryLog.Api.Controllers
             });
         }
 
-        [HttpPost("user/recovery-complete")]
+        [HttpPost("recovery-complete")]
         public async Task<object> AccountRecoveryCompleteAsync([FromBody] AccountRecoveryDTO recoveryDTO)
         {
             (bool success, string message) = await appUserServices.AccountRecoveryCompleteAsync(recoveryDTO);
@@ -57,23 +55,5 @@ namespace EntryLog.Api.Controllers
                 message,
             });
         }
-
-        [HttpPost("test-image")]
-        [Consumes("multipart/form-data")]
-        public async Task<object> ImageTestAsync([FromForm] ImageUploadRequest request)
-        {
-            (bool success, string message) = await workSessionServices.ImageTestAsync(request.Image);
-            return Ok(new
-            {
-                success,
-                message,
-            });
-        }
-    }
-
-    public class ImageUploadRequest
-    {
-        [Required]
-        public IFormFile Image { get; set; }
     }
 }
