@@ -11,6 +11,11 @@ namespace EntryLog.Data.MongoDB.Repositories
         private readonly IMongoCollection<WorkSession> _collection
             = database.GetCollection<WorkSession>(CollectionNames.WorkSessions);
 
+        public async Task<int> CountAsync(ISpecification<WorkSession> spec)
+        {
+            return await BaseRepository<WorkSession>.CountAsync(_collection.AsQueryable(), spec);
+        }
+
         public async Task CreateAsync(WorkSession workSession)
         {
             await _collection.InsertOneAsync(workSession);
@@ -23,9 +28,9 @@ namespace EntryLog.Data.MongoDB.Repositories
                 x.Status == Entities.Enums.SessionStatus.InProgress).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<WorkSession>> GetAllAsync(Specification<WorkSession> spec)
+        public async Task<IEnumerable<WorkSession>> GetAllAsync(ISpecification<WorkSession> spec)
         {
-            return await _collection.Find(spec.Expression).ToListAsync();
+            return await BaseRepository<WorkSession>.GetAllBySpecificationAsync(_collection.AsQueryable(), spec);
         }
 
         public async Task<WorkSession> GetByEmployeeId(int id)

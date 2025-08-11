@@ -9,7 +9,8 @@ namespace EntryLog.Data.Interfaces
         Task UpdateAsync(WorkSession workSession);
         Task<WorkSession> GetByIdAsync(Guid id);
         Task<WorkSession> GetByEmployeeId(int id);
-        Task<IEnumerable<WorkSession>> GetAllAsync(Specification<WorkSession> spec);
+        Task<IEnumerable<WorkSession>> GetAllAsync(ISpecification<WorkSession> spec);
+        Task<int> CountAsync(ISpecification<WorkSession> spec);
         Task<WorkSession> GetActiveSessionByEmployeeIdAsync(int id);
     }
 }
