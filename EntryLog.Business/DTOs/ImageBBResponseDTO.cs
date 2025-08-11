@@ -33,19 +33,19 @@ namespace EntryLog.Business.DTOs
         public string DisplayUrl { get; set; }
 
         [JsonPropertyName("width")]
-        public string Width { get; set; }
+        public int Width { get; set; }
 
         [JsonPropertyName("height")]
-        public string Height { get; set; }
+        public int Height { get; set; }
 
         [JsonPropertyName("size")]
-        public string Size { get; set; }
+        public int Size { get; set; }
 
         [JsonPropertyName("time")]
-        public string Time { get; set; }
+        public long Time { get; set; }
 
         [JsonPropertyName("expiration")]
-        public string Expiration { get; set; }
+        public int Expiration { get; set; }
 
         [JsonPropertyName("image")]
         public Image Image { get; set; }
