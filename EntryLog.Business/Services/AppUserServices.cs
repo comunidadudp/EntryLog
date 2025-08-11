@@ -11,13 +11,15 @@ namespace EntryLog.Business.Services
         IAppUserRepository userRepository,
         IPasswordHasherService hasherService,
         IEncryptionService encryptionService,
-        IEmailSenderService emailSenderService) : IAppUserServices
+        IEmailSenderService emailSenderService,
+        IUriService uriService) : IAppUserServices
     {
         private readonly IEmployeeRepository _employeeRepository = employeeRepository;
         private readonly IAppUserRepository _userRepository = userRepository;
         private readonly IPasswordHasherService _hasherService = hasherService;
         private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly IEmailSenderService _emailSenderService = emailSenderService;
+        private readonly IUriService _uriService = uriService;
 
         public async Task<(bool success, string message)> AccountRecoveryCompleteAsync(AccountRecoveryDTO recoveryDTO)
         {
@@ -96,7 +98,7 @@ namespace EntryLog.Business.Services
             var vars = new RecoveryAccountVariables
             {
                 Name = user.Name,
-                Url = $"https://localhost:5000/account/recovery?token={recoveryToken}"
+                Url = $"{_uriService.ApplicationURL}/account/recovery?token={recoveryToken}"
             };
 
             bool isSend = await _emailSenderService.SendEmailWithTemplateAsync("RecoveryToken", user.Email, vars);
