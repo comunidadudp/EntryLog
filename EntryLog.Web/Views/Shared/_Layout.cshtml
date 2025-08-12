@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>EntryLog - @ViewBag.Title</title>
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <link rel="icon" href="~/lib/kaiadmin/assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
+
+    <!-- Fonts and icons -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+            google: {"families":["Public Sans:300,400,500,600,700"]},
+            custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['../lib/kaiadmin/assets/css/fonts.min.css']},
+            active: function() {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/plugins.min.css">
+    <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/kaiadmin.min.css">
+
+</head>
+<body>
+    <div class="wrapper d-flex flex-column min-vh-100">
+        <header>
+            <!-- navbar -->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-black mb-3">
+                <div class="container-fluid">
+                    <img src="~/assets/images/logo_entrylog_dark.png" alt="navbar brand" class="navbar-brand" height="50">
+                    <div class="d-flex" role="search">
+
+                        @* @{
+                            string[] noButtons = ["CompleteRecover"];
+                            var path = Html.ViewContext.View.Path;
+                            bool isLoginPage = path.Contains("Login");
+                            bool showButtons = !noButtons.Any(x => path.Contains(x));
+                        }
+
+                        @if (showButtons)
+                        {
+                            if (isLoginPage)
+                            {
+                                <a href="registro" class="btn btn-outline-light my-2 my-sm-0">
+                                    Registrarme
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="login" class="btn btn-outline-light my-2 my-sm-0">
+                                    Iniciar sesión
+                                </a>
+                            }
+                        } *@
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="flex-grow-1 d-flex justify-content-center align-items-center">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- End Custom template -->
+    <!--   Core JS Files   -->
+    <script src="~/lib/kaiadmin/assets/js/core/jquery-3.7.1.min.js"></script>
+    <script src="~/lib/kaiadmin/assets/js/core/popper.min.js"></script>
+    <script src="~/lib/kaiadmin/assets/js/core/bootstrap.min.js"></script>
+
+    <!-- Bootstrap Notify -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

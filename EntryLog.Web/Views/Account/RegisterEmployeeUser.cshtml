@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "_Layout";
+    ViewBag.Title = "Registro de empleado";
+}
+
+<div class="container col-xl-10 col-xxl-8 px-1 py-1">
+    <div class="row align-items-center g-lg-5 py-5">
+        <div class="col-lg-7 text-center text-lg-start">
+            <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">
+                Regístrate para controlar tus sesiones de trabajo
+            </h1>
+            <p class="col-lg-10 fs-4">
+                EntryLog te ofrece una serie de herramientas para gestionar tus sesiones desde diferentes lugares del mundo.
+            </p>
+        </div>
+        <div class="col-md-10 mx-auto col-lg-5">
+            <form id="register-form" class="p-4 p-md-3 border rounded-3 bg-body needs-validation" novalidate>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="documentNumber" name="documentNumber" required
+                           placeholder=""> <label for="documentNumber">Nro Documento*</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="username" name="username" required
+                           placeholder=""> <label for="username">Correo electrónico*</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="cellPhone" name="cellPhone" required
+                           placeholder=""> <label for="cellPhone">Nro Celular*</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" required
+                           id="password" name="password" placeholder="Contraseña">
+                    <label for="Password">Contraseña*</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" required
+                           id="passwordConf" name="passwordConf" placeholder="Confirmar Contraseña">
+                    <label for="passwordConf">Confirmar contraseña*</label>
+                </div>
+                <div id="register-form-button" class="text-center">
+                    <button type="submit" class="btn btn-dark w-100 mt-4 mb-3">Registrarse</button>
+                </div>
+                <hr class="my-2">
+                <small class="text-body-secondary">
+                    Al hacer clic en Registrarse, acepta los términos de uso.
+                </small>
+            </form>
+        </div>
+    </div>
+</div>
+

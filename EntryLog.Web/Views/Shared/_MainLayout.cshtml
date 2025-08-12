@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>EntryLog - @ViewBag.Title</title>
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <link rel="icon" href="~/lib/kaiadmin/assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
+
+    <!-- Fonts and icons -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+            google: {"families":["Public Sans:300,400,500,600,700"]},
+            custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['../lib/kaiadmin/assets/css/fonts.min.css']},
+            active: function() {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/plugins.min.css">
+    <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/kaiadmin.min.css">
+
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" data-background-color="dark">
+            <div class="sidebar-logo">
+                <!-- Logo Header -->
+                <div class="logo-header" data-background-color="dark">
+
+                    <a href="index.html" class="logo">
+                        <img src="~/assets/images/logo_entrylog_dark.png" alt="navbar brand" class="navbar-brand" height="50">
+                    </a>
+                    <div class="nav-toggle">
+                        <button class="btn btn-toggle toggle-sidebar">
+                            <i class="gg-menu-right"></i>
+                        </button>
+                        <button class="btn btn-toggle sidenav-toggler">
+                            <i class="gg-menu-left"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- End Logo Header -->
+            </div>
+
+            <div class="sidebar-wrapper scrollbar scrollbar-inner">
+                <div class="sidebar-content">
+                    <ul class="nav nav-secondary">
+                        <li id="main-link" class="nav-item">
+                            <a href="/empleado/menu">
+                                <i class="fas fa-home"></i>
+                                <p>Menú</p>
+                            </a>
+                        </li>
+                        <li id="sessions-link" class="nav-item">
+                            <a href="/empleado/sesiones">
+                                <i class="fas fa-suitcase"></i>
+                                <p>Sesiones</p>
+                            </a>
+                        </li>
+                        <li id="faceid-link" class="nav-item">
+                            <a href="/empleado/faceid">
+                                <i class="fas fa-vector-square"></i>
+                                <p>Face ID</p>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- End Sidebar -->
+
+        <div class="main-panel">
+            <div class="main-header">
+                <div class="main-header-logo">
+                    <!-- Logo Header -->
+                    <div class="logo-header" data-background-color="dark">
+
+                        <a href="index.html" class="logo">
+                            <img src="~/assets/images/logo_entrylog_light.png" alt="navbar brand" class="navbar-brand" height="20">
+                        </a>
+                        <div class="nav-toggle">
+                            <button class="btn btn-toggle toggle-sidebar">
+                                <i class="gg-menu-right"></i>
+                            </button>
+                            <button class="btn btn-toggle sidenav-toggler">
+                                <i class="gg-menu-left"></i>
+                            </button>
+                        </div>
+                        <button class="topbar-toggler more">
+                            <i class="gg-more-vertical-alt"></i>
+                        </button>
+
+                    </div>
+                    <!-- End Logo Header -->
+                </div>
+
+
+                <!-- Navbar Header -->
+                <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+                    <div class="container-fluid">
+                        <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
+                            <li class="nav-item topbar-user dropdown hidden-caret">
+                                <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
+                                    <div class="avatar-sm">
+                                        <span class="avatar-title rounded-circle border border-white">NC</span>
+                                    </div>
+                                    <span class="profile-username">
+                                        <span class="op-7">Hola,</span> <span class="fw-bold">Juan Stevan</span>
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-user animated fadeIn">
+                                    <div class="dropdown-user-scroll scrollbar-outer">
+                                    <li>
+                                        <div class="user-box">
+                                            <div class="avatar-lg">
+                                                <span class="avatar-title rounded-circle border border-white">NC</span>
+                                            </div>
+                                            <div class="u-text">
+                                                <h4>Juan Stevan</h4>
+                                                <p class="text-muted">user@@email.com</p><a href="profile.html" class="btn btn-xs btn-secondary btn-sm">Ver perfil</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="/logout">Cerrar sesión</a>
+                                    </li>
+                    </div>
+                    </ul>
+                    </li>
+                    </ul>
+            </div>
+            </nav>
+            <!-- End Navbar -->
+        </div>
+
+        <div class="container">
+            <div class="page-inner">
+                @RenderBody()
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container-fluid">
+
+                <div class="copyright ms-auto">
+                    2024, made with <i class="fa fa-heart heart text-danger"></i> by <a href="http://www.themekita.com">ThemeKita</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- End Custom template -->
+    <!--   Core JS Files   -->
+    <script src="~/lib/kaiadmin/assets/js/core/jquery-3.7.1.min.js"></script>
+    <script src="~/lib/kaiadmin/assets/js/core/popper.min.js"></script>
+    <script src="~/lib/kaiadmin/assets/js/core/bootstrap.min.js"></script>
+
+    <!-- jQuery Scrollbar -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+
+    <!-- Chart JS -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/chart.js/chart.min.js"></script>
+
+    <!-- jQuery Sparkline -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+
+    <!-- Chart Circle -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/chart-circle/circles.min.js"></script>
+
+    <!-- Datatables -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/datatables/datatables.min.js"></script>
+
+    <!-- Bootstrap Notify -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+
+    <!-- jQuery Vector Maps -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
+    <script src="~/lib/kaiadmin/assets/js/plugin/jsvectormap/world.js"></script>
+
+    <!-- Sweet Alert -->
+    <script src="~/lib/kaiadmin/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+
+    <!-- Kaiadmin JS -->
+    <script src="~/lib/kaiadmin/assets/js/kaiadmin.min.js"></script>
+
+    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
+    <script src="~/lib/kaiadmin/assets/js/setting-demo.js"></script>
+   @*  <script src="~/lib/kaiadmin/assets/js/demo.js"></script> *@
+
+    <!-- ✅ Librería face-api.js -->
+   @*  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script> *@
+    @* <script src="~/face-api.js/dist/face-api.min.js"></script> *@
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
