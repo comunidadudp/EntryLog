@@ -143,7 +143,7 @@ namespace EntryLog.Business.Services
 
             await _userRepository.CreateAsync(user);
 
-            return (true, "Empleado creado exitosamente", new LoginResponseDTO(user.Code, user.Role.ToString(), user.Email));
+            return (true, "Empleado creado exitosamente", new LoginResponseDTO(user.Code, user.Role.ToString(), user.Email, user.Name));
         }
 
         public async Task<(bool success, string message, LoginResponseDTO? data)> UserLoginAsync(UserCredentialsDTO credentialsDTO)
@@ -161,7 +161,7 @@ namespace EntryLog.Business.Services
             if (!accessGranted)
                 return (false, "Usuario y/o contraseña incorrecta", null);
 
-            return (true, "Login successfull", new LoginResponseDTO(user.Code, user.Role.ToString(), user.Email));
+            return (true, "Login successfull", new LoginResponseDTO(user.Code, user.Role.ToString(), user.Email, user.Name));
         }
     }
 }

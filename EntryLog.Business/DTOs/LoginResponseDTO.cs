@@ -3,5 +3,6 @@
     public record class LoginResponseDTO(
         int DocumentNumber,
         string Role,
-        string Email);
+        string Email,
+        string Name);
 }
