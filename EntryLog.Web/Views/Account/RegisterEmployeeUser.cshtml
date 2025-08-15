@@ -15,6 +15,7 @@
         </div>
         <div class="col-md-10 mx-auto col-lg-5">
             <form id="register-form" class="p-4 p-md-3 border rounded-3 bg-body needs-validation" novalidate>
+                @Html.AntiForgeryToken()
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="documentNumber" name="documentNumber" required
                            placeholder=""> <label for="documentNumber">Nro Documento*</label>
@@ -48,4 +49,8 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/account.register.js"></script>
+}
 

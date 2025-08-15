@@ -99,6 +99,9 @@
                     <!-- End Logo Header -->
                 </div>
 
+                @{
+                    UserViewModel userData = User.GetUserData()!;
+                }
 
                 <!-- Navbar Header -->
                 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
@@ -110,7 +113,7 @@
                                         <span class="avatar-title rounded-circle border border-white">NC</span>
                                     </div>
                                     <span class="profile-username">
-                                        <span class="op-7">Hola,</span> <span class="fw-bold">Juan Stevan</span>
+                                        <span class="op-7">Hola,</span> <span class="fw-bold">@userData.Name</span>
                                     </span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-user animated fadeIn">
@@ -121,14 +124,14 @@
                                                 <span class="avatar-title rounded-circle border border-white">NC</span>
                                             </div>
                                             <div class="u-text">
-                                                <h4>Juan Stevan</h4>
-                                                <p class="text-muted">user@@email.com</p><a href="profile.html" class="btn btn-xs btn-secondary btn-sm">Ver perfil</a>
+                                                <h4>@userData.Name</h4>
+                                                <p class="text-muted">@userData.Email</p><a href="profile.html" class="btn btn-xs btn-secondary btn-sm">Ver perfil</a>
                                             </div>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="/logout">Cerrar sesión</a>
+                                        <a class="dropdown-item" href="/account/logout">Cerrar sesión</a>
                                     </li>
                     </div>
                     </ul>
