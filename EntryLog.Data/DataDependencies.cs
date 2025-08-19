@@ -26,6 +26,7 @@ namespace EntryLog.Data
             //MongoDB
             AppUserSerializer.Init();
             CheckSerializer.Init();
+            FaceIdSerializer.Init();
             LocationSerializer.Init();
             WorkSessionSerializer.Init();
 
