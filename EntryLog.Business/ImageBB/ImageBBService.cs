@@ -13,9 +13,8 @@ namespace EntryLog.Business.ImageBB
         private readonly IHttpClientFactory _clientFactory = clientFactory;
         private readonly ImageBBOptions _options = options.Value;
 
-        public async Task<ImageBBResponseDTO> UploadAsync(Stream image, string type, string filename, string extension)
+        public async Task<string> UploadAsync(Stream image, string type, string filename)
         {
-
             using var client = _clientFactory.CreateClient(ApiNames.ImageBB);
             using var streamContent = new StreamContent(image);
             streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(type);
@@ -30,7 +29,7 @@ namespace EntryLog.Business.ImageBB
             if (response.IsSuccessStatusCode)
             {
                 ImageBBResponseDTO imageBBResponse = JsonSerializer.Deserialize<ImageBBResponseDTO>(responseBody)!;
-                return imageBBResponse;
+                return imageBBResponse.Data.Url;
             }
             else
             {
