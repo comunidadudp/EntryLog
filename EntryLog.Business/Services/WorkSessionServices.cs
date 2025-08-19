@@ -45,8 +45,8 @@ namespace EntryLog.Business.Services
             string filename = sessionDTO.Image.FileName;
             string ext = Path.GetExtension(sessionDTO.Image.FileName);
 
-            ImageBBResponseDTO imageBB = await _loadImagesService
-                .UploadAsync(sessionDTO.Image.OpenReadStream(), sessionDTO.Image.ContentType, filename, ext);
+            string imageUrl = await _loadImagesService
+                .UploadAsync(sessionDTO.Image.OpenReadStream(), sessionDTO.Image.ContentType, filename);
 
             //Crear la nueva sesion
             session = new WorkSession
@@ -64,7 +64,7 @@ namespace EntryLog.Business.Services
                         IpAddress = _uriService.RemoteIpAddress,
                     },
                     Notes = sessionDTO.Notes,
-                    PhotoUrl = imageBB.Data.Url
+                    PhotoUrl = imageUrl
                 },
                 Status = SessionStatus.InProgress
             };
@@ -96,8 +96,8 @@ namespace EntryLog.Business.Services
             string filename = sessionDTO.Image.FileName;
             string ext = Path.GetExtension(sessionDTO.Image.FileName);
 
-            ImageBBResponseDTO imageBB = await _loadImagesService
-                .UploadAsync(sessionDTO.Image.OpenReadStream(), sessionDTO.Image.ContentType, filename, ext);
+            string imageUrl = await _loadImagesService
+                .UploadAsync(sessionDTO.Image.OpenReadStream(), sessionDTO.Image.ContentType, filename);
 
             activeSession.CheckOut ??= new Check();
             activeSession.CheckOut.Method = _uriService.UserAgent;
@@ -106,7 +106,7 @@ namespace EntryLog.Business.Services
             activeSession.CheckOut.Location.Latitude = sessionDTO.Latitude;
             activeSession.CheckOut.Location.Longitude = sessionDTO.Longitude;
             activeSession.CheckOut.Location.IpAddress = _uriService.RemoteIpAddress;
-            activeSession.CheckOut.PhotoUrl = imageBB.Data.Url;
+            activeSession.CheckOut.PhotoUrl = imageUrl;
             activeSession.CheckOut.Notes = sessionDTO.Notes;
             activeSession.Status = SessionStatus.Completed;
 
