@@ -3,6 +3,7 @@ using EntryLog.Business.Cryptography;
 using EntryLog.Business.ImageBB;
 using EntryLog.Business.Infrastructure;
 using EntryLog.Business.Interfaces;
+using EntryLog.Business.JWT;
 using EntryLog.Business.Mailtrap;
 using EntryLog.Business.Mailtrap.Models;
 using EntryLog.Business.Services;
@@ -22,8 +23,11 @@ namespace EntryLog.Business
             services.Configure<EncryptionKeyValues>(configuration.GetSection(nameof(EncryptionKeyValues)));
             services.Configure<MailtrapApiOptions>(configuration.GetSection(nameof(MailtrapApiOptions)));
             services.Configure<ImageBBOptions>(configuration.GetSection(nameof(ImageBBOptions)));
+            services.Configure<JwtConfiguration>(configuration.GetSection(nameof(JwtConfiguration)));
 
             // HttpClientFactory
+            services.AddHttpClient();
+
             services.AddHttpClient(ApiNames.MailtrapIO, (sp, client) =>
             {
                 MailtrapApiOptions options = sp.GetRequiredService<IOptions<MailtrapApiOptions>>().Value;
@@ -32,12 +36,11 @@ namespace EntryLog.Business
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiToken);
             });
 
-            //https://api.imgbb.com/1/upload?expiration=600&key=YOUR_CLIENT_API_KEY
             services.AddHttpClient(ApiNames.ImageBB, (sp, client) =>
             {
                 ImageBBOptions options = sp.GetRequiredService<IOptions<ImageBBOptions>>().Value;
 
-                client.BaseAddress = new Uri(options.ApiUrl);//https://api.imgbb.com
+                client.BaseAddress = new Uri(options.ApiUrl);
             });
 
             // servicios de infraestructura
@@ -47,10 +50,12 @@ namespace EntryLog.Business
             services.AddSingleton<IEncryptionService, RSAAsymmetricEncryptionService>();
             services.AddSingleton<IPasswordHasherService, Argon2PasswordHasherService>();
             services.AddScoped<ILoadImagesService, ImageBBService>();
+            services.AddScoped<IJwtService, CustomBearerAuthentication>();
 
             // servicios de aplicación
             services.AddScoped<IAppUserServices, AppUserServices>();
             services.AddScoped<IWorkSessionServices, WorkSessionServices>();
+            services.AddScoped<IFaceIdService, FaceIdService>();
 
             return services;
         }
