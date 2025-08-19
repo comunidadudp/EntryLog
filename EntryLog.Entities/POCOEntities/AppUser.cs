@@ -14,6 +14,7 @@ namespace EntryLog.Entities.POCOEntities
         public int Attempts { get; set; }
         public string? RecoveryToken { get; set; }
         public bool RecoveryTokenActive { get; set; }
+        public FaceID? FaceID { get; set; }
         public bool Active { get; set; }
     }
 }
