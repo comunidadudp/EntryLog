@@ -81,6 +81,9 @@ namespace EntryLog.Business.Services
                 return (false, "No se puedo cargar la imagen", null);
             }
 
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return new(false, "No se pudo subir la imagen", null);
+
             user.FaceID = new FaceID
             {
                 ImageURL = imageUrl,
