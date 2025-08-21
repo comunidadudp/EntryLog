@@ -1,0 +1,47 @@
+﻿.video-container {
+    position: relative;
+    display: inline-block;
+}
+
+video {
+    display: block;
+}
+
+.circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 250px;
+    border: 3px solid red;
+    border-radius: 50%;
+    pointer-events: none;
+    display: none;
+}
+
+#countdown-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 100px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 5px rgba(0,100,0,0.9);
+    pointer-events: none;
+    display: none;
+    z-index: 10;
+}
+
+#loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 550px; /* mismo ancho que el video */
+    height: 500px; /* mismo alto que el video */
+    background-color: rgba(0, 0, 0, 0.5); /* oscurece un poco */
+    display: none;
+    visibility: hidden;
+    z-index: 10;
+}
