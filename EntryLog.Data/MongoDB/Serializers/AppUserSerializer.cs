@@ -37,6 +37,7 @@ namespace EntryLog.Data.MongoDB.Serializers
                     cm.MapMember(x => x.Attempts).SetElementName("intentos");
                     cm.MapMember(x => x.RecoveryToken).SetElementName("token_recuperacion");
                     cm.MapMember(x => x.RecoveryTokenActive).SetElementName("token_recuperacion_activo");
+                    cm.MapMember(x => x.FaceID).SetElementName("faceid");
                     cm.MapMember(x => x.Active).SetElementName("activo");
                 });
             }
