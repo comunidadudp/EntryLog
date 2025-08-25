@@ -31,5 +31,33 @@ namespace EntryLog.Web.Controllers
                 data
             });
         }
+
+        [HttpGet("empleado/faceid/session")]
+        public async Task<IActionResult> GenerateSecurityTokenAsync()
+        {
+            UserViewModel? user = User.GetUserData();
+
+            if (user is null)
+                return Unauthorized();
+
+            var token = await faceIdService
+                .GenerateReferenceImageTokenAsync(user.NameIdentifier.ToString());
+
+            return Ok(new { token });
+        }
+
+
+        [HttpGet("empleado/faceid/reference")]
+        public async Task<IActionResult> GetReferenceImageAsync([FromHeader(Name = "Authorization")] string authHeader)
+        {
+            UserViewModel? user = User.GetUserData();
+
+            if (user is null)
+                return Unauthorized();
+
+            string imageBase64 = await faceIdService.GetReferenceImageAsync(authHeader);
+
+            return Ok(new { imageBase64 });
+        }
     }
 }
