@@ -3,7 +3,7 @@ using EntryLog.Business.Interfaces;
 using EntryLog.Business.Mappers;
 using EntryLog.Data.Interfaces;
 using EntryLog.Entities.POCOEntities;
-using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace EntryLog.Business.Services
@@ -148,7 +148,7 @@ namespace EntryLog.Business.Services
             if (claims == null || !claims.TryGetValue("purpose", out var purpose) || purpose?.ToString() != "faceid_reference")
                 return string.Empty;
 
-            if (!claims.TryGetValue(JwtRegisteredClaimNames.Sub, out var nameId) || int.TryParse(nameId?.ToString(), out var code))
+            if (!claims.TryGetValue(ClaimTypes.NameIdentifier, out var nameId) || !int.TryParse(nameId?.ToString(), out var code))
                 return string.Empty;
 
             var faceIdDTO = await GetFaceIdAsync(code);
