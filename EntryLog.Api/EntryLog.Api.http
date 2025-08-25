@@ -1,6 +1,0 @@
-@EntryLog.Api_HostAddress = http://localhost:5021
-
-GET {{EntryLog.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

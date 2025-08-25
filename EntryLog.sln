@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntryLog.Data", "EntryLog.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntryLog.Business", "EntryLog.Business\EntryLog.Business.csproj", "{A8DE7912-8A95-2A2B-6DA1-AFDA8023C33A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntryLog.Api", "EntryLog.Api\EntryLog.Api.csproj", "{EFD5EB8B-F13F-49A2-9D24-D394D9976786}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntryLog.Web", "EntryLog.Web\EntryLog.Web.csproj", "{798370A4-09A9-4627-ABD6-46949CFEF116}"
 EndProject
 Global
@@ -31,10 +29,6 @@ Global
 		{A8DE7912-8A95-2A2B-6DA1-AFDA8023C33A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8DE7912-8A95-2A2B-6DA1-AFDA8023C33A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8DE7912-8A95-2A2B-6DA1-AFDA8023C33A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EFD5EB8B-F13F-49A2-9D24-D394D9976786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EFD5EB8B-F13F-49A2-9D24-D394D9976786}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EFD5EB8B-F13F-49A2-9D24-D394D9976786}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EFD5EB8B-F13F-49A2-9D24-D394D9976786}.Release|Any CPU.Build.0 = Release|Any CPU
 		{798370A4-09A9-4627-ABD6-46949CFEF116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{798370A4-09A9-4627-ABD6-46949CFEF116}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{798370A4-09A9-4627-ABD6-46949CFEF116}.Release|Any CPU.ActiveCfg = Release|Any CPU
