@@ -7,6 +7,7 @@ using EntryLog.Business.Specs;
 using EntryLog.Data.Interfaces;
 using EntryLog.Entities.Enums;
 using EntryLog.Entities.POCOEntities;
+using System.Text.Json;
 
 namespace EntryLog.Business.Services
 {
@@ -17,6 +18,8 @@ namespace EntryLog.Business.Services
         ILoadImagesService loadImagesService,
         IUriService uriService) : IWorkSessionServices
     {
+        private const int DescriptorLength = 128;
+
         private readonly IEmployeeRepository _employeeRepository = employeeRepository;
         private readonly IAppUserRepository _userRepository = userRepository;
         private readonly IWorkSessionRepository _sessionRepository = sessionRepository;
@@ -24,29 +27,48 @@ namespace EntryLog.Business.Services
         private readonly IUriService _uriService = uriService;
 
 
-        public async Task<(bool success, string message)> OpenJobSessionAsync(CreateJobSessionDTO sessionDTO)
+        public async Task<(bool success, string message, GetWorkSessionDTO? data)> OpenJobSessionAsync(CreateWorkSessionDTO sessionDTO)
         {
             int code = int.Parse(sessionDTO.UserId);
 
             var (success, message) = await ValidateEmployeeUserAsync(code);
 
             if (!success)
-                return (success, message);
+                return (success, message, null);
 
             // Verificar si el usuario actual tiene una sesion abierta
             WorkSession session = await _sessionRepository.GetActiveSessionByEmployeeIdAsync(code);
 
             if (session != null)
             {
-                return (false, "El empleado tiene una sesiòn activa");
+                return (false, "El empleado tiene una sesiòn activa", null);
             }
 
             //Insercion de imagen
-            string filename = sessionDTO.Image.FileName;
             string ext = Path.GetExtension(sessionDTO.Image.FileName);
+            string filename = $"checkin-{DateTime.UtcNow}{ext}";
 
             string imageUrl = await _loadImagesService
                 .UploadAsync(sessionDTO.Image.OpenReadStream(), sessionDTO.Image.ContentType, filename);
+
+            List<float>? descriptor;
+
+            try
+            {
+                descriptor = JsonSerializer.Deserialize<List<float>>(sessionDTO.Descriptor);
+            }
+            catch (JsonException)
+            {
+                return (false, "Descriptor JSON no válido", null);
+            }
+
+            if (descriptor is null || descriptor.Count != DescriptorLength)
+                return (false, "Descriptor no válido", null);
+
+            (success, message) = await ValidateEmployeeFaceDescriptorAsync(code, [.. descriptor]);
+
+            if (!success)
+                return (success, message, null);
 
             //Crear la nueva sesion
             session = new WorkSession
@@ -64,7 +86,8 @@ namespace EntryLog.Business.Services
                         IpAddress = _uriService.RemoteIpAddress,
                     },
                     Notes = sessionDTO.Notes,
-                    PhotoUrl = imageUrl
+                    PhotoUrl = imageUrl,
+                    Descriptor = descriptor
                 },
                 Status = SessionStatus.InProgress
             };
@@ -73,7 +96,7 @@ namespace EntryLog.Business.Services
             await _sessionRepository.CreateAsync(session);
 
             //Respuesta
-            return (true, "Sesión abierta exitosamente");
+            return (true, "Sesión abierta exitosamente", WorkSessionMapper.MapToGetWorkSessionDTO(session));
         }
 
         public async Task<(bool success, string message)> CloseJobSessionAsync(CloseJobSessionDTO sessionDTO)
@@ -171,6 +194,29 @@ namespace EntryLog.Business.Services
                 return (false, "El usuario no existe");
 
             return (true, "");
+        }
+
+        private async Task<(bool success, string message)> ValidateEmployeeFaceDescriptorAsync
+            (int employeeCode, float[] currentDescriptor)
+        {
+            if (currentDescriptor is null || currentDescriptor.Length != 128)
+                return (false, "Descriptor no válido");
+
+            AppUser user = await _userRepository.GetByCodeAsync(employeeCode);
+            List<float> storedDescriptor = user.FaceID!.Descriptor;
+
+            double distance = EuclideanDistance(currentDescriptor, [.. storedDescriptor]);
+            bool match = distance < 0.5;
+
+            return (match, match ? "" : "El rostro no coincide con el FaceId registrado");
+        }
+
+        private static double EuclideanDistance(float[] a, float[] b)
+        {
+            double sum = 0;
+            for (int i = 0; i < a.Length; i++)
+                sum += Math.Pow(a[i] - b[i], 2);
+            return Math.Sqrt(sum);
         }
     }
 }
