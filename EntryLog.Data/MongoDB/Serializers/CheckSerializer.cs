@@ -21,6 +21,7 @@ namespace EntryLog.Data.MongoDB.Serializers
                     cm.MapMember(x => x.Location).SetElementName("ubicacion");
 
                     cm.MapMember(x => x.PhotoUrl).SetElementName("url_foto");
+                    cm.MapMember(x => x.Descriptor).SetElementName("descriptor");
 
                     cm.MapMember(x => x.Notes)
                          .SetElementName("notas")
