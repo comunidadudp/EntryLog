@@ -2,11 +2,12 @@
 
 namespace EntryLog.Business.DTOs
 {
-    public record CreateJobSessionDTO(
+    public record CreateWorkSessionDTO(
         string UserId,
         string Latitude,
         string Longitude,
         IFormFile Image,
-        string? Notes
+        string? Notes,
+        string Descriptor
     );
 }
