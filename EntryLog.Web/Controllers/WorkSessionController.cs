@@ -17,8 +17,12 @@ namespace EntryLog.Web.Controllers
         public async Task<IActionResult> Index()
         {
             UserViewModel userData = User.GetUserData()!;
+
             EmployeeFaceIdDTO faceId = await faceIdService.GetFaceIdAsync(userData.NameIdentifier);
             ViewBag.IsFaceIdActive = faceId.Active;
+
+            bool hasActiveSession = await workSessionServices.HasActiveAnySessionAsync(userData.NameIdentifier);
+            ViewBag.HasActiveSession = hasActiveSession;
 
             PaginatedResult<GetWorkSessionDTO> model = await workSessionServices.GetSessionListByFilterAsync(new WorkSessionQueryFilter
             {
@@ -44,6 +48,27 @@ namespace EntryLog.Web.Controllers
                     model.Notes,
                     model.Descriptor));
 
+            return Json(new
+            {
+                success,
+                message,
+                data
+            });
+        }
+
+        [HttpPost("empleado/sesiones/cerrar")]
+        public async Task<JsonResult> CloseWorkSessionAsync(CloseWorkSessionViewModel model)
+        {
+            UserViewModel userData = User.GetUserData()!;
+            (bool success, string message, GetWorkSessionDTO? data) = await workSessionServices.CloseJobSessionAsync(
+                new CloseWorkSessionDTO(
+                    model.SessionId,
+                    userData.NameIdentifier.ToString(),
+                    model.Latitude,
+                    model.Longitude,
+                    model.Image,
+                    model.Notes,
+                    model.Descriptor));
             return Json(new
             {
                 success,

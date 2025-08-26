@@ -4,18 +4,35 @@
     $("#sessions-link").addClass("active");
 })();
 
+const OPEN_ACTION = 'open';
+const CLOSE_ACTION = 'close';
+
 const video = document.getElementById('video');
 const loader = document.getElementById("loader-overlay");
 const snapshotCanvas = document.getElementById('snapshot');
 
-
 const recognitionModal = document.getElementById("recognition-modal");
 const recognitionBootstrapModal = new bootstrap.Modal(recognitionModal);
 
-async function openRecognitionModal() {
+var workSessionAction = OPEN_ACTION;
+
+async function openRecognitionModal(action) {
+    changeModalDesign(action);
     activeVideoSectionLoader();
     recognitionBootstrapModal.show();
     await initRecognitionStream();
+}
+
+function changeModalDesign(action) {
+
+    recognitionModal.setAttribute('action', action);
+    workSessionAction = action;
+
+    if (action === OPEN_ACTION) {
+        $("#camera-modal-title").text('Abrir sesión');
+    } else {
+        $("#camera-modal-title").text('Cerrar sesión');
+    }
 }
 
 async function initRecognitionStream() {
@@ -23,12 +40,25 @@ async function initRecognitionStream() {
         startVideo().then(() => {
             startLocation().then(() => {
                 console.log("OK");
-                inactiveVideoSectionLoader();
             }).catch(() => {
                 //error al activar la localizacion
+                $.notify({
+                    icon: 'icon-bell',
+                    title: 'Notificación',
+                    message: 'Error al activar la localizacion. Verifica permisos'
+                }, {
+                    type: 'danger'
+                });
             });
         }).catch(() => {
             //error al cargar el video
+            $.notify({
+                icon: 'icon-bell',
+                title: 'Notificación',
+                message: 'Error al activar la localizacion. Verifica permisos'
+            }, {
+                type: 'danger'
+            });
         });
     }).catch((err) => {
         //error de obtener modelos
@@ -119,30 +149,47 @@ function takeSnapshot() {
     snapshotCanvas.height = video.videoHeight;
     let ctxSnapshot = snapshotCanvas.getContext('2d');
     ctxSnapshot.drawImage(video, 0, 0);
-    //const imgData = snapshotCanvas.toDataURL("image/png");
     stopVideo();
     video.classList.add('visually-hidden');
-    //circleOverlay.classList.add('visually-hidden');
     $("#faceid-helper").addClass('visually-hidden');
-    //console.log("Foto tomada:", imgData);
 }
 
 async function openWorkSession() {
 
     $("#open-session-button-container").html(`
-        <button class="btn btn-primary" type="button" disabled>
+        <button onclick="startCountdown()" id="save-session-button" class="btn btn-primary" type="button" disabled>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Validando...
         </button>`);
 
     if (!canvasHaveContent(snapshotCanvas)) {
+        cleanupVideoSession();
+        recognitionBootstrapModal.hide();
         $.notify({
-            // options
             icon: 'icon-bell',
             title: 'Notificación',
             message: 'Debes capturar tu rostro'
         }, {
-            // settings
+            type: 'warning'
+        });
+        return;
+    }
+
+    if (!hasMatch) {
+        cleanupVideoSession();
+        let ctxSnapshot = snapshotCanvas.getContext('2d');
+        ctxSnapshot.clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
+        snapshotCanvas.style.display = 'none'
+        recognitionBootstrapModal.hide();
+
+        $("#save-session-button").attr("disabled", true);
+        $("#save-session-button").text("Preparando...");
+
+        $.notify({
+            icon: 'icon-bell',
+            title: 'Notificación',
+            message: 'Su rostro no coincide con el FaceID'
+        }, {
             type: 'warning'
         });
         return;
@@ -152,15 +199,16 @@ async function openWorkSession() {
     console.log("LOCATION POST", location);
     console.log(`Ubicación obtenida: Lat=${location.lat}, Lng=${location.lng}, Precisión=${location.accuracy}m`);
 
-    // 👇 1. Detectar el rostro en el canvas y obtener el descriptor
     const faceDetection = await faceapi
         .detectSingleFace(snapshotCanvas, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
         .withFaceDescriptor();
 
-    console.log("DETECTION POST", !faceDetection, faceDetection.descriptor);
+    console.log("DETECTION POST", !faceDetection, faceDetection?.descriptor);
 
     if (faceDetection == null || faceDetection == undefined) {
+        cleanupVideoSession();
+        recognitionBootstrapModal.hide();
         $.notify({
             icon: 'icon-bell',
             title: 'Notificación',
@@ -169,7 +217,6 @@ async function openWorkSession() {
         return;
     }
 
-    // 👇 2. Convertir Float32Array en array normal para que sea serializable
     const descriptorArray = Array.from(faceDetection.descriptor);
 
     const formData = new FormData();
@@ -181,8 +228,12 @@ async function openWorkSession() {
         formData.append("image", blob, "capture.png");
         formData.append("descriptor", JSON.stringify(descriptorArray));
 
+        let path = workSessionAction === OPEN_ACTION
+            ? 'abrir'
+            : 'cerrar';
+
         $.ajax({
-            url: '/empleado/sesiones/abrir',
+            url: `/empleado/sesiones/${path}`,
             method: 'POST',
             async: true,
             cache: false,
@@ -200,17 +251,25 @@ async function openWorkSession() {
                 $("#no-sessions-alert").remove();
                 recognitionBootstrapModal.hide();
                 setTimeout(() => {
-                    $("#open-session-button-container")
-                        .html(`<button id="save-faceid-button" type="button" class="btn btn-primary">Aprobar</button>`);
+                    $("#open-session-button-container").html(`
+                    <button onclick="startCountdown()" id="save-session-button" type="button" class="btn btn-primary" disabled>
+                        Preparando...
+                    </button>`);
                 }, 1000);
             },
             success: (result) => {
-
                 if (result.success) {
-                    console.log(result.data)
-                    drawSessionContent(result.data);
-                }
+                    $("#add-work-session-btn").remove();
+                    cleanupVideoSession();
+                    clearSnapshotCanvas();
 
+                    if (result.data.status === STATUS_IN_PROGRESS) {
+                        drawSessionContent(result.data);
+                    } else {
+                        updateSessionContent(result.data);
+                    }
+
+                }
                 $.notify({
                     icon: 'icon-bell',
                     title: 'Notificación',
@@ -220,6 +279,7 @@ async function openWorkSession() {
                 });
             },
             error: (err) => {
+                console.log("Error: ", err);
                 $.notify({
                     icon: 'icon-bell',
                     title: 'Notificación',
@@ -227,6 +287,7 @@ async function openWorkSession() {
                 }, {
                     type: 'error'
                 });
+                clearSnapshotCanvas();
             }
         });
 
@@ -238,11 +299,48 @@ const STATUS_IN_PROGRESS = "InProgress";
 const STATUS_COMPLETED_NAME = "Completada";
 const STATUS_IN_PROGRESS_NAME = "En Progreso";
 
+
+function updateSessionContent(data) {
+    let sessionId = data.id;
+
+    let statusIcon = "";
+    let statusName = "";
+
+    switch (data.status) {
+        case STATUS_COMPLETED:
+            statusIcon = "fa-check-circle text-success";
+            statusName = STATUS_COMPLETED_NAME;
+            drawOpenSessionButton();
+            break;
+
+        case STATUS_IN_PROGRESS:
+            statusIcon = "fa-spinner text-primary";
+            statusName = STATUS_IN_PROGRESS_NAME;
+            break;
+        default:
+            break;
+    }
+
+    $(`#status-fields-${sessionId}`).html(`<i class="fas fa-1x ${statusIcon}"></i>${statusName}`);
+    $(`#close-session-${sessionId}`).remove();
+    $(`#ckeckout-date-${sessionId}`).text(data.checkOut.date);
+    $(`#total-worked-${sessionId}`).text(data.totalWorked);
+}
+
+function drawOpenSessionButton() {
+    $("#open-work-session-content").html(`
+        <div id="add-work-session-btn">
+            <button onclick="openRecognitionModal('open')" class="btn btn-primary btn-round">Agregar sesión</button>
+        </div>`);
+}
+
+
 /**
  * Dibuja la tarjeta que contiene la información de la sesión
  * @param {object} data Información de Face ID
  */
 function drawSessionContent(data) {
+    console.log("data", data);
     let sessionCard = document.createElement('div');
     sessionCard.classList.add('card');
 
@@ -264,7 +362,7 @@ function drawSessionContent(data) {
     }
 
     let closeActionButton = data.status == STATUS_IN_PROGRESS
-        ? `<button class="btn btn-label-success btn-round btn-sm">
+        ? `<button  id="close-session-${data.id}" onclick="openRecognitionModal('close')" class="btn btn-label-success btn-round btn-sm">
                <span class="btn-label">
                 <i class="fa fa-arrow-circle-right"></i>
                </span>
@@ -272,14 +370,13 @@ function drawSessionContent(data) {
            </button>`
         : ``;
 
-    let checkInDate = formatDate(new Date(data.checkIn.date));
-    let checkOutDate = data.checkOut != null ? formatDate(new Date(data.checkOut.date)) : 'No presenta';
-    let totalWorked = data.totalWorked != null ? formatDate(data.totalWorked) : 'N/A';
+    let checkOutDate = data.checkOut != null ? data.checkOut.date : 'No presenta';
+    let totalWorked = data.totalWorked != null ? data.totalWorked : 'N/A';
 
     sessionCard.innerHTML = `
     <div class="card-header">
                 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
-                    <div>
+                    <div id="status-fields-${data.id}">
                         <i class="fas fa-1x ${statusIcon}"></i>
                         ${statusName}
                     </div>
@@ -298,47 +395,21 @@ function drawSessionContent(data) {
                 <div class="row">
                     <div class="col-3">
                         <h6 class="fw-bolder">Entrada:</h6>
-                        <p class="card-text">${checkInDate}</p>
+                        <p class="card-text">${data.checkIn.date}</p>
                     </div>
                     <div class="col-3">
                         <h6 class="fw-bolder">Salida:</h6>
-                        <p class="card-text">${checkOutDate}</p>
+                        <p id="ckeckout-date-${data.id}" class="card-text">${checkOutDate}</p>
                     </div>
                     <div class="col-3">
                         <h6 class="fw-bolder">Duración:</h6>
-                        <p class="card-text">${totalWorked}</p>
+                        <p id="total-worked-${data.id}" class="card-text">${totalWorked}</p>
                     </div>
                 </div>
             </div>`;
 
     const workSessionsDiv = document.getElementById("work-sessions");
-    workSessionsDiv.appendChild(sessionCard, workSessionsDiv.lastChild);
-}
-
-function formatDate(date) {
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // meses 0-11
-    const year = date.getFullYear();
-
-    let hours = date.getHours();
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-
-    hours = hours % 12;       // convierte a formato 12h
-    hours = hours ? hours : 12; // 0 => 12
-    const strHours = String(hours).padStart(2, "0");
-
-    return `${day}/${month}/${year} ${strHours}:${minutes} ${ampm}`;
-}
-
-function formatTimeSpan(ms) {
-    let totalSeconds = Math.floor(ms / 1000);
-    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-    totalSeconds %= 3600;
-    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-    const seconds = String(totalSeconds % 60).padStart(2, "0");
-
-    return `${hours}:${minutes}:${seconds}`;
+    workSessionsDiv.insertBefore(sessionCard, workSessionsDiv.firstChild);
 }
 
 /**
@@ -357,23 +428,35 @@ function inactiveVideoSectionLoader() {
     loader.style.visibility = 'hidden';
 }
 
-
+/**
+ * Inicializa la geolocalización mediante el navegador
+ */
 async function startLocation() {
     try {
         const location = await getCurrentLocation({ highAccuracy: true, timeout: 10000, maximumAge: 0 });
         console.log(`Ubicación obtenida: Lat=${location.lat}, Lng=${location.lng}, Precisión=${location.accuracy}m`);
     } catch (err) {
         console.error("Error al obtener la ubicación:", err.message);
+        $.notify({
+            icon: 'icon-bell',
+            title: 'Notificación',
+            message: 'Error al activar la localizacion. Verifica permisos'
+        }, {
+            type: 'danger'
+        });
     }
 }
 
+/**
+ * Obtiene la imagen de referencia de FaceId
+ * @returns
+ */
 async function getReferenceImage() {
-    //Obtener el token efímero
+
     const tokenResp = await fetch('/empleado/faceid/session', { credentials: 'include' });
     if (!tokenResp.ok) throw new Error("Error obteniendo token");
     const { token } = await tokenResp.json();
 
-    // Usar token para imagen base64
     const imgResp = await fetch('/empleado/faceid/reference', {
         headers: {
             "Authorization": `Bearer ${token}`,  // Se envía el JWT
@@ -384,11 +467,14 @@ async function getReferenceImage() {
     if (!imgResp.ok) throw new Error("Error obteniendo imagen de referencia");
     const { imageBase64 } = await imgResp.json();
 
-    // 3️⃣ Cargar imagen en objeto Image sin guardarla en disco
     return await faceapi.fetchImage(imageBase64);
 }
 
-// ✅ Obtener descriptor facial de una imagen
+/**
+ * Obtiene el descriptor facial de una imagen
+ * @param {any} img
+ * @returns
+ */
 async function getDescriptorFromImage(img) {
     const detection = await faceapi
         .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
@@ -415,29 +501,76 @@ function canvasHaveContent(canvas) {
     return false; // Todos los píxeles son transparentes
 }
 
+let overlayCanvas = null;
+let intervalId = null;
+
+/**
+ * Limpia el elemento video y detiene la transmisión
+ */
+function cleanupVideoSession() {
+    if (overlayCanvas && overlayCanvas.parentNode) {
+        overlayCanvas.parentNode.removeChild(overlayCanvas);
+        overlayCanvas = null;
+    }
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+    stopVideo();
+    video.classList.add('visually-hidden');
+    $("#faceid-helper").removeClass('visually-hidden');
+}
+
+/**
+ * Limpiar el elemento canvas del snapshot
+ */
+function clearSnapshotCanvas() {
+    snapshotCanvas.getContext('2d').clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
+    snapshotCanvas.style.display = 'none';
+}
+
 let hasMatch = false;
 
 (() => {
+    let overlayCanvas = null;
+    let intervalId = null;
+
     video.addEventListener('play', async () => {
-        const canvas = faceapi.createCanvasFromMedia(video);
-        video.parentNode.append(canvas);
+
+        // Elimina cualquier canvas anterior para evitar duplicados
+        if (overlayCanvas && overlayCanvas.parentNode) {
+            overlayCanvas.parentNode.removeChild(overlayCanvas);
+            overlayCanvas = null;
+        }
+
+        overlayCanvas = faceapi.createCanvasFromMedia(video);
+        video.parentNode.append(overlayCanvas);
         const displaySize = { width: video.width, height: video.height };
-        faceapi.matchDimensions(canvas, displaySize);
+        faceapi.matchDimensions(overlayCanvas, displaySize);
 
-        canvas.style.position = 'absolute';
-        canvas.style.top = '0';
-        canvas.style.left = '0';
+        overlayCanvas.style.position = 'absolute';
+        overlayCanvas.style.top = '0';
+        overlayCanvas.style.left = '0';
 
-        console.log("display Size" + displaySize.width);
+        console.log("Obteniendo imagen de referencia...");
 
-        // ✅ Imagen de referencia para comparación
-        //const referenceImage = await faceapi.fetchImage('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE1fHx8ZW58MHx8fHx8');
         const referenceImage = await getReferenceImage();
-        console.log("referenceImage");
-        console.log(referenceImage);
-        const referenceDescriptor = await getDescriptorFromImage(referenceImage);
+        console.log("Imagen de referencia obtenida");
+        console.log("Obteniendo descriptor de imagen...");
 
-        setInterval(async () => {
+        const referenceDescriptor = await getDescriptorFromImage(referenceImage);
+        console.log("Descriptor obtenido");
+
+        inactiveVideoSectionLoader();
+        $("#save-session-button").removeAttr("disabled");
+        $("#save-session-button").text("Abrir");
+
+        // Limpia cualquier intervalo anterior
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
+
+        intervalId = setInterval(async () => {
             const detections = await faceapi
                 .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
                 .withFaceLandmarks()
@@ -445,24 +578,45 @@ let hasMatch = false;
                 .withFaceDescriptors();
 
             const resized = faceapi.resizeResults(detections, displaySize);
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height + 20);
+            overlayCanvas.getContext('2d').clearRect(0, 0, overlayCanvas.width, overlayCanvas.height + 20);
 
             for (const detection of resized) {
                 const box = detection.detection.box;
                 const drawBox = new faceapi.draw.DrawBox(box, { label: '' });
-                drawBox.draw(canvas);
+                drawBox.draw(overlayCanvas);
 
-                // ✅ Dibujar landmarks
-                //faceapi.draw.drawFaceLandmarks(canvas, detection);
+                // Dibujar landmarks
+                //faceapi.draw.drawFaceLandmarks(overlayCanvas, detection);
 
-                // ✅ Comparar rostro con referencia
+                // Comparar rostro con referencia
                 const similarity = faceapi.euclideanDistance(detection.descriptor, referenceDescriptor);
                 console.log(`Similitud: ${similarity}`);
                 hasMatch = similarity < 0.5;
                 const match = hasMatch ? '✅ Coincide' : '❌ No coincide';
-                new faceapi.draw.DrawTextField([`${match}`], { x: box.left, y: box.top - 20 }).draw(canvas);
+                new faceapi.draw.DrawTextField([`${match}`], { x: box.left, y: box.top - 20 }).draw(overlayCanvas);
             }
 
         }, 500);
     });
+
+    // Elimina el canvas cuando el video se detiene
+    function removeOverlayCanvas() {
+        if (overlayCanvas && overlayCanvas.parentNode) {
+            overlayCanvas.parentNode.removeChild(overlayCanvas);
+            overlayCanvas = null;
+        }
+        if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+    }
+
+    video.addEventListener('pause', removeOverlayCanvas);
+    video.addEventListener('ended', removeOverlayCanvas);
+
 })();
+
+// Limpieza al cerrar el modal para evitar desalineación del video
+recognitionModal.addEventListener('hidden.bs.modal', function () {
+    cleanupVideoSession();
+});

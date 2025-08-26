@@ -8,24 +8,48 @@
 <link href="~/css/work.index.css" rel="stylesheet" />
 
 @{
-    var isFaceIdActive = (bool)ViewBag.IsFaceIdActive;
+    bool isFaceIdActive = (bool)ViewBag.IsFaceIdActive;
+    bool hasActiveSession = (bool)ViewBag.HasActiveSession;
 }
 
 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
     <div>
-        <h3 class="fw-bold mb-3">Face ID</h3>
+        <h3 class="fw-bold mb-3">Sesiones</h3>
     </div>
 
-    @if (isFaceIdActive)
-    {
-        <div class="ms-md-auto py-2 py-md-0">
-            <button class="btn btn-primary btn-round" onclick="openRecognitionModal()">
-                Agregar sesión
-            </button>
-        </div>
-    }
-
+    <div id="open-work-session-content" class="ms-md-auto py-2 py-md-0">
+        @if (isFaceIdActive && !hasActiveSession)
+        {
+            <div id="add-work-session-btn">
+                <button onclick="openRecognitionModal('open')" class="btn btn-primary btn-round">Agregar sesión</button>
+            </div>
+        }
+    </div>
 </div>
+
+@if (!isFaceIdActive)
+{
+    <div id="faceid-no-configured-alert" class="col-md-12">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h6>
+                <a href="/empleado/faceid" class="btn-link"><b>Face ID</b></a>
+                no ha sido configurado y es requerido para poder gestionar las sesiones de trabajo
+            </h6>
+
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@if (isFaceIdActive && Model.ResultsCount == 0)
+{
+    <div id="no-sessions-alert" class="col-md-12">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h6>Cree una sesión para comenzar</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
 
 @{
     const string STATUS_COMPLETED = "Completed";
@@ -34,23 +58,7 @@
     const string STATUS_IN_PROGRESS_NAME = "En Progreso";
 }
 
-
-<div id="work-sessions" class="row">
-
-    @if (!isFaceIdActive)
-    {
-        <div id="faceid-no-configured-alert" class="col-md-12">
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <h6>
-                    <a href="#" class="btn-link"><b>Face ID</b></a>
-                    no ha sido configurado y es requerido para poder gestionar las sesiones de trabajo
-                </h6>
-
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    }
-
+<div id="work-sessions" class="row px-3">
 
     @foreach (var item in Model.Results ?? [])
     {
@@ -71,11 +79,10 @@
             default:
                 break;
         }
-
         <div class="card">
             <div class="card-header">
                 <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
-                    <div>
+                    <div id="status-fields-@item.Id">
                         <i class="fas fa-1x @statusIcon"></i>
                         @statusName
                     </div>
@@ -88,7 +95,7 @@
                         </button>
                         @if (item.Status == STATUS_IN_PROGRESS)
                         {
-                            <button class="btn btn-label-info btn-round btn-sm">
+                            <button id="close-session-@item.Id" onclick="openRecognitionModal('close')" class="btn btn-label-success btn-round btn-sm">
                                 <span class="btn-label">
                                     <i class="fa fa-arrow-circle-right"></i>
                                 </span>
@@ -102,31 +109,24 @@
                 <div class="row">
                     <div class="col-3">
                         <h6 class="fw-bolder">Entrada:</h6>
-                        <p class="card-text">
-                            @item.CheckIn.Date.ToString("dd/MM/yyyy hh:mm:ss tt")
-                        </p>
+                        <p class="card-text">@item.CheckIn.Date</p>
                     </div>
                     <div class="col-3">
                         <h6 class="fw-bolder">Salida:</h6>
-                        <p class="card-text">
-                            @(item.CheckOut != null ? item.CheckOut.Date.ToString("dd/MM/yyyy hh:mm:ss tt") : "No presenta")
-                        </p>
+                        <p id="ckeckout-date-@item.Id" class="card-text">@(item.CheckOut != null ? item.CheckOut.Date : "No presenta")</p>
                     </div>
                     <div class="col-3">
                         <h6 class="fw-bolder">Duración:</h6>
-                        <p class="card-text">
-                            @((item.TotalWorked?.ToString(@"hh\:mm\ss")) ?? "N/A")
-                        </p>
+                        <p id="total-worked-@item.Id" class="card-text">@(item.TotalWorked ?? "N/A")</p>
                     </div>
                 </div>
             </div>
         </div>
     }
-
 </div>
 
-
-<div class="modal fade" id="recognition-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="camera-modal-title" aria-hidden="true">
+<!-- Modal -->
+<div class="modal fade" id="recognition-modal" data-action="open" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="camera-modal-title" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -138,13 +138,13 @@
                     <div class="row">
                         <div class="col-md-12">
                             <p id="faceid-helper" class="text-sm-start">
-                                Acerque el rostro al círculo y mantenga su posición durante 3 segundos
+                                Presion el boton 'Abrir' y mantenga su posición durante 3 segundos
                             </p>
                         </div>
                         <div class="col-md-12">
                             <div style="position: relative; display: inline-block;">
                                 <video id="video" width="400" height="300" autoplay muted"></video>
-                                <canvas id="snapshot" style="position: relative; display: inline-block;"></canvas>
+                                <canvas id="snapshot" style="position: relative; display: none;"></canvas>
                                 <div id="countdown-overlay"></div>
                                 <div id="loader-overlay" class="d-flex justify-content-center align-items-center">
                                     <div class="spinner-border text-white" style="width: 4rem; height: 4rem;">
@@ -159,7 +159,9 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="snapshotAgain()">Reintentar</button>
                 <div id="open-session-button-container">
-                    <button onclick="startCountdown()" id="save-session-button" type="button" class="btn btn-primary">Abrir</button>
+                    <button onclick="startCountdown()" id="save-session-button" type="button" class="btn btn-primary" disabled>
+                        Preparando...
+                    </button>
                 </div>
             </div>
         </div>
