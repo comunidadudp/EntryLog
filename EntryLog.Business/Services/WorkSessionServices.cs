@@ -99,28 +99,42 @@ namespace EntryLog.Business.Services
             return (true, "Sesión abierta exitosamente", WorkSessionMapper.MapToGetWorkSessionDTO(session));
         }
 
-        public async Task<(bool success, string message)> CloseJobSessionAsync(CloseJobSessionDTO sessionDTO)
+        public async Task<(bool success, string message, GetWorkSessionDTO? data)> CloseJobSessionAsync(CloseWorkSessionDTO sessionDTO)
         {
             int code = int.Parse(sessionDTO.UserId);
 
             var (success, message) = await ValidateEmployeeUserAsync(code);
 
             if (!success)
-                return (success, message);
+                return (success, message, null);
 
             WorkSession activeSession = await _sessionRepository.GetActiveSessionByEmployeeIdAsync(code);
 
             if (activeSession is null)
             {
-                return (false, "No existe una sesión activa para el empleado");
+                return (false, "No existe una sesión activa para el empleado", null);
             }
 
             //Insercion de imagen
-            string filename = sessionDTO.Image.FileName;
             string ext = Path.GetExtension(sessionDTO.Image.FileName);
+            string filename = $"checkout-{DateTime.UtcNow}{ext}";
 
             string imageUrl = await _loadImagesService
                 .UploadAsync(sessionDTO.Image.OpenReadStream(), sessionDTO.Image.ContentType, filename);
+
+            List<float>? descriptor;
+
+            try
+            {
+                descriptor = JsonSerializer.Deserialize<List<float>>(sessionDTO.Descriptor);
+            }
+            catch (JsonException)
+            {
+                return (false, "Descriptor JSON no válido", null);
+            }
+
+            if (descriptor is null || descriptor.Count != DescriptorLength)
+                return (false, "Descriptor no válido", null);
 
             activeSession.CheckOut ??= new Check();
             activeSession.CheckOut.Method = _uriService.UserAgent;
@@ -131,11 +145,12 @@ namespace EntryLog.Business.Services
             activeSession.CheckOut.Location.IpAddress = _uriService.RemoteIpAddress;
             activeSession.CheckOut.PhotoUrl = imageUrl;
             activeSession.CheckOut.Notes = sessionDTO.Notes;
+            activeSession.CheckOut.Descriptor = descriptor;
             activeSession.Status = SessionStatus.Completed;
 
             await _sessionRepository.UpdateAsync(activeSession);
 
-            return (true, "Sesión cerrada exitosamente");
+            return (true, "Sesión cerrada exitosamente", WorkSessionMapper.MapToGetWorkSessionDTO(activeSession));
         }
 
         public async Task<PaginatedResult<GetWorkSessionDTO>> GetSessionListByFilterAsync(WorkSessionQueryFilter filter)
@@ -217,6 +232,12 @@ namespace EntryLog.Business.Services
             for (int i = 0; i < a.Length; i++)
                 sum += Math.Pow(a[i] - b[i], 2);
             return Math.Sqrt(sum);
+        }
+
+        public async Task<bool> HasActiveAnySessionAsync(int employeeCode)
+        {
+            WorkSession session = await _sessionRepository.GetActiveSessionByEmployeeIdAsync(employeeCode);
+            return session is not null;
         }
     }
 }

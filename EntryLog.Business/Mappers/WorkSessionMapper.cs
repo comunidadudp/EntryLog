@@ -1,4 +1,5 @@
 ﻿using EntryLog.Business.DTOs;
+using EntryLog.Business.Utils;
 using EntryLog.Entities.POCOEntities;
 
 namespace EntryLog.Business.Mappers
@@ -13,7 +14,7 @@ namespace EntryLog.Business.Mappers
                 new GetCheckDTO(
                     session.CheckIn.Method,
                     session.CheckIn.DeviceName,
-                    session.CheckIn.Date,
+                    TimeFunctions.GetSAPacificStandardTime(session.CheckIn.Date).ToString("yyyy-MM-dd hh:mm"),
                     new GetLocationDTO(
                         session.CheckIn.Location.Latitude,
                         session.CheckIn.Location.Longitude,
@@ -23,14 +24,14 @@ namespace EntryLog.Business.Mappers
                 session.CheckOut != null ? new GetCheckDTO(
                     session.CheckOut.Method,
                     session.CheckOut.DeviceName,
-                    session.CheckOut.Date,
+                    TimeFunctions.GetSAPacificStandardTime(session.CheckOut.Date).ToString("yyyy-MM-dd hh:mm"),
                     new GetLocationDTO(
                         session.CheckOut.Location.Latitude,
                         session.CheckOut.Location.Longitude,
                         session.CheckOut.Location.IpAddress),
                     session.CheckOut.PhotoUrl,
                     session.CheckOut.Notes) : null,
-                session.TotalWorked,
+                session.TotalWorked?.ToString(@"hh\:mm\:ss"),
                 session.Status.ToString());
         }
     }
