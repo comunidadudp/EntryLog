@@ -5,14 +5,14 @@
         int EmployeeId,
         GetCheckDTO CheckIn,
         GetCheckDTO? CheckOut,
-        TimeSpan? TotalWorked,
+        string? TotalWorked,
         string Status
         );
 
     public record GetCheckDTO(
         string Method,
         string? DeviceName,
-        DateTime Date,
+        string Date,
         GetLocationDTO Location,
         string PhotoUrl,
         string? Notes
