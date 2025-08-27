@@ -27,7 +27,7 @@ namespace EntryLog.Business.Services
         private readonly IUriService _uriService = uriService;
 
 
-        public async Task<(bool success, string message, GetWorkSessionDTO? data)> OpenJobSessionAsync(CreateWorkSessionDTO sessionDTO)
+        public async Task<(bool success, string message, GetWorkSessionDTO? data)> OpenSessionAsync(CreateWorkSessionDTO sessionDTO)
         {
             int code = int.Parse(sessionDTO.UserId);
 
@@ -99,7 +99,7 @@ namespace EntryLog.Business.Services
             return (true, "Sesión abierta exitosamente", WorkSessionMapper.MapToGetWorkSessionDTO(session));
         }
 
-        public async Task<(bool success, string message, GetWorkSessionDTO? data)> CloseJobSessionAsync(CloseWorkSessionDTO sessionDTO)
+        public async Task<(bool success, string message, GetWorkSessionDTO? data)> CloseSessionAsync(CloseWorkSessionDTO sessionDTO)
         {
             int code = int.Parse(sessionDTO.UserId);
 
@@ -238,6 +238,29 @@ namespace EntryLog.Business.Services
         {
             WorkSession session = await _sessionRepository.GetActiveSessionByEmployeeIdAsync(employeeCode);
             return session is not null;
+        }
+
+        public async Task<GetWorkSessionDTO> GetSessionByIdAsync(string id)
+        {
+            Guid guid = Guid.Parse(id);
+            WorkSession session = await _sessionRepository.GetByIdAsync(guid);
+            return WorkSessionMapper.MapToGetWorkSessionDTO(session);
+        }
+
+        public async Task<IEnumerable<GetLocationDTO>> GetLastLocationsByEmployeeAsync(int employeeCode)
+        {
+            var filter = new WorkSessionQueryFilter
+            {
+                EmployeeId = employeeCode,
+                Sort = Enums.SortType.Descending,
+                PageIndex = 1,
+                PageSize = 5
+            };
+
+            PaginatedResult<GetWorkSessionDTO> paginatedResult = await GetSessionListByFilterAsync(filter);
+            IEnumerable<GetWorkSessionDTO>? lastSessions = paginatedResult.ResultsCount > 0 ? paginatedResult.Results : [];
+            IEnumerable<GetLocationDTO> lastCheckInLocations = lastSessions?.Select(session => session.CheckIn.Location) ?? [];
+            return lastCheckInLocations;
         }
     }
 }

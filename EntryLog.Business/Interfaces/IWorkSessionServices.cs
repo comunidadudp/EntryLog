@@ -6,9 +6,11 @@ namespace EntryLog.Business.Interfaces
 {
     public interface IWorkSessionServices
     {
-        Task<(bool success, string message, GetWorkSessionDTO? data)> OpenJobSessionAsync(CreateWorkSessionDTO sessionDTO);
-        Task<(bool success, string message, GetWorkSessionDTO? data)> CloseJobSessionAsync(CloseWorkSessionDTO sessionDTO);
+        Task<(bool success, string message, GetWorkSessionDTO? data)> OpenSessionAsync(CreateWorkSessionDTO sessionDTO);
+        Task<(bool success, string message, GetWorkSessionDTO? data)> CloseSessionAsync(CloseWorkSessionDTO sessionDTO);
         Task<PaginatedResult<GetWorkSessionDTO>> GetSessionListByFilterAsync(WorkSessionQueryFilter filter);
+        Task<GetWorkSessionDTO> GetSessionByIdAsync(string id);
         Task<bool> HasActiveAnySessionAsync(int employeeCode);
+        Task<IEnumerable<GetLocationDTO>> GetLastLocationsByEmployeeAsync(int employeeCode);
     }
 }

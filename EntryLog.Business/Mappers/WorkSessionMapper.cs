@@ -14,7 +14,7 @@ namespace EntryLog.Business.Mappers
                 new GetCheckDTO(
                     session.CheckIn.Method,
                     session.CheckIn.DeviceName,
-                    TimeFunctions.GetSAPacificStandardTime(session.CheckIn.Date).ToString("yyyy-MM-dd hh:mm"),
+                    TimeFunctions.GetSAPacificStandardTime(session.CheckIn.Date).ToString("yyyy-MM-dd hh:mm tt"),
                     new GetLocationDTO(
                         session.CheckIn.Location.Latitude,
                         session.CheckIn.Location.Longitude,
@@ -24,7 +24,7 @@ namespace EntryLog.Business.Mappers
                 session.CheckOut != null ? new GetCheckDTO(
                     session.CheckOut.Method,
                     session.CheckOut.DeviceName,
-                    TimeFunctions.GetSAPacificStandardTime(session.CheckOut.Date).ToString("yyyy-MM-dd hh:mm"),
+                    TimeFunctions.GetSAPacificStandardTime(session.CheckOut.Date).ToString("yyyy-MM-dd hh:mm tt"),
                     new GetLocationDTO(
                         session.CheckOut.Location.Latitude,
                         session.CheckOut.Location.Longitude,
