@@ -87,7 +87,7 @@
                         @statusName
                     </div>
                     <div class="ms-md-auto py-2 py-md-0">
-                        <button class="btn btn-label-info btn-round btn-sm">
+                        <button onclick="showSessionDetail('@item.Id')" class="btn btn-label-info btn-round btn-sm">
                             <span class="btn-label">
                                 <i class="fa fa-eye"></i>
                             </span>
@@ -125,7 +125,7 @@
     }
 </div>
 
-<!-- Modal -->
+<!-- Open and Close Modal  -->
 <div class="modal fade" id="recognition-modal" data-action="open" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="camera-modal-title" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -163,6 +163,84 @@
                         Preparando...
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detail-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="detail-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="camera-modal-title">Detalle</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">ID de Sesión</h6>
+                            <p id="session-id"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">ID de Empleado</h6>
+                            <p id="employee-id"></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h6 class="fw-bold">Estado</h6>
+                            <p id="session-status"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="fw-bold">Total Trabajado</h6>
+                            <p id="total-worked"></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold">Entrada</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item"><b>Método:</b> <span id="checkin-method"></span></li>
+                                <li class="list-group-item"><b>Dispositivo:</b> <span id="checkin-device"></span></li>
+                                <li class="list-group-item"><b>Fecha:</b> <span id="checkin-date"></span></li>
+                                <li class="list-group-item"><b>Notas:</b> <span id="checkin-notes"></span></li>
+                                <li class="list-group-item"><b>Foto:</b> <img id="checkin-photo" src="" alt="Foto entrada" class="img-thumbnail" style="max-width:100px;" /></li>
+                                <li class="list-group-item">
+                                    <b>Ubicación:</b>
+                                    <ul>
+                                        <li><b>Latitud:</b> <span id="checkin-lat"></span></li>
+                                        <li><b>Longitud:</b> <span id="checkin-lng"></span></li>
+                                        <li><b>IP:</b> <span id="checkin-ip"></span></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="fw-bold">Salida</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item"><b>Método:</b> <span id="checkout-method"></span></li>
+                                <li class="list-group-item"><b>Dispositivo:</b> <span id="checkout-device"></span></li>
+                                <li class="list-group-item"><b>Fecha:</b> <span id="checkout-date"></span></li>
+                                <li class="list-group-item"><b>Notas:</b> <span id="checkout-notes"></span></li>
+                                <li class="list-group-item"><b>Foto:</b> <img id="checkout-photo" src="" alt="Foto salida" class="img-thumbnail" style="max-width:100px;" /></li>
+                                <li class="list-group-item">
+                                    <b>Ubicación:</b>
+                                    <ul>
+                                        <li><b>Latitud:</b> <span id="checkout-lat"></span></li>
+                                        <li><b>Longitud:</b> <span id="checkout-lng"></span></li>
+                                        <li><b>IP:</b> <span id="checkout-ip"></span></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>

@@ -89,5 +89,13 @@ namespace EntryLog.Web.Controllers
                 });
             }
         }
+
+        [HttpGet("cuenta/salir")]
+        [Authorize]
+        public async Task<IActionResult> LogOutAsync()
+        {
+            await HttpContext.SignOutCookiesAsync();
+            return RedirectToAction("Login");
+        }
     }
 }

@@ -170,7 +170,35 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mapcontainer">
-                            <div id="world-map" class="w-100" style="height: 400px; background-color: transparent;"></div>
+                            @* <div id="map" class="w-100" style="height: 400px; background-color: transparent;"></div> *@
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12675959.241152383!2d-74.297333!3d4.570868!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f99a4d2373c7d%3A0x50a79fdcf8bc23ad!2sColombia!5e0!3m2!1ses!2sco!4v1693067665265!5m2!1ses!2sco"
+                                    width="600"
+                                    height="450"
+                                    style="border:0; width: 100%;"
+                                    allowfullscreen=""
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Últimas ubicaciones</div>
+                            </div>
+                            <div class="card-body">
+                                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12675959.241152383!2d-74.297333!3d4.570868!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f99a4d2373c7d%3A0x50a79fdcf8bc23ad!2sColombia!5e0!3m2!1ses!2sco!4v1693067665265!5m2!1ses!2sco"
+                                        width="600"
+                                        height="450"
+                                        style="border:0; width: 100%;"
+                                        allowfullscreen=""
+                                        loading="lazy"
+                                        referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -182,7 +210,7 @@
 @section Scripts {
     <script>
             var world_map = new jsVectorMap({
-            selector: "#world-map",
+            selector: "#map",
             map: "world",
             zoomOnScroll: false,
             regionStyle: {
@@ -192,8 +220,8 @@
             },
             markers: [
                 {
-                    name: 'Indonesia',
-                    coords: [-6.229728, 106.6894311],
+                    name: 'Tuluá',
+                    coords: [4.1021524, -76.1981496],
                     style: {
                         fill: '#435ebe'
                     }

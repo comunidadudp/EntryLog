@@ -39,7 +39,7 @@ namespace EntryLog.Web.Controllers
         {
             UserViewModel userData = User.GetUserData()!;
 
-            (bool success, string message, GetWorkSessionDTO? data) = await workSessionServices.OpenJobSessionAsync(
+            (bool success, string message, GetWorkSessionDTO? data) = await workSessionServices.OpenSessionAsync(
                 new CreateWorkSessionDTO(
                     userData.NameIdentifier.ToString(),
                     model.Latitude,
@@ -60,7 +60,7 @@ namespace EntryLog.Web.Controllers
         public async Task<JsonResult> CloseWorkSessionAsync(CloseWorkSessionViewModel model)
         {
             UserViewModel userData = User.GetUserData()!;
-            (bool success, string message, GetWorkSessionDTO? data) = await workSessionServices.CloseJobSessionAsync(
+            (bool success, string message, GetWorkSessionDTO? data) = await workSessionServices.CloseSessionAsync(
                 new CloseWorkSessionDTO(
                     model.SessionId,
                     userData.NameIdentifier.ToString(),
@@ -74,6 +74,17 @@ namespace EntryLog.Web.Controllers
                 success,
                 message,
                 data
+            });
+        }
+
+
+        [HttpGet("empleado/sesion/detail")]
+        public async Task<JsonResult> GetSessionInfoByIdAsync(string id)
+        {
+            var session = await workSessionServices.GetSessionByIdAsync(id);
+            return Json(new
+            {
+                data = session
             });
         }
     }

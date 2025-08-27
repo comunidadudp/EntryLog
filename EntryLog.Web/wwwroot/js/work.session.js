@@ -362,7 +362,7 @@ function drawSessionContent(data) {
     }
 
     let closeActionButton = data.status == STATUS_IN_PROGRESS
-        ? `<button  id="close-session-${data.id}" onclick="openRecognitionModal('close')" class="btn btn-label-success btn-round btn-sm">
+        ? `<button   id="close-session-${data.id}" onclick="openRecognitionModal('close')" class="btn btn-label-success btn-round btn-sm">
                <span class="btn-label">
                 <i class="fa fa-arrow-circle-right"></i>
                </span>
@@ -381,7 +381,7 @@ function drawSessionContent(data) {
                         ${statusName}
                     </div>
                     <div class="ms-md-auto py-2 py-md-0">
-                        <button class="btn btn-label-info btn-round btn-sm">
+                        <button onclick="showSessionDetail('@item.Id')" class="btn btn-label-info btn-round btn-sm">
                             <span class="btn-label">
                                 <i class="fa fa-eye"></i>
                             </span>
@@ -527,6 +527,93 @@ function cleanupVideoSession() {
 function clearSnapshotCanvas() {
     snapshotCanvas.getContext('2d').clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
     snapshotCanvas.style.display = 'none';
+}
+
+
+function showSessionDetail(id) {
+
+    console.log("ID", id);
+
+    $.ajax({
+        url: `/empleado/sesion/detail?id=${id}`,
+        type: 'GET',
+        async: false,
+        beforeSend: () => {
+
+        },
+        complete: () => {
+
+        },
+        success: (result) => {
+            console.log(result.data);
+
+            let data = result.data;
+            let statusName;
+
+            switch (data.status) {
+                case STATUS_COMPLETED:
+                    statusName = STATUS_COMPLETED_NAME;
+                    break;
+
+                case STATUS_IN_PROGRESS:
+                    statusName = STATUS_IN_PROGRESS_NAME;
+                    break;
+                default:
+                    break;
+            }
+
+
+            // Propiedades principales
+            document.getElementById('session-id').textContent = data.id;
+            document.getElementById('employee-id').textContent = data.employeeId;
+            document.getElementById('session-status').textContent = statusName;
+            document.getElementById('total-worked').textContent = data.totalWorked || 'N/A';
+
+            // CheckIn
+            document.getElementById('checkin-method').textContent = data.checkIn.method;
+            document.getElementById('checkin-device').textContent = data.checkIn.deviceName || 'N/A';
+            document.getElementById('checkin-date').textContent = data.checkIn.date;
+            document.getElementById('checkin-notes').textContent = data.checkIn.notes || 'N/A';
+            document.getElementById('checkin-photo').src = data.checkIn.photoUrl;
+            document.getElementById('checkin-lat').textContent = data.checkIn.location.latitude;
+            document.getElementById('checkin-lng').textContent = data.checkIn.location.longtitude;
+            document.getElementById('checkin-ip').textContent = data.checkIn.location.ipAddress;
+
+            // CheckOut (puede ser null)
+            if (data.checkOut) {
+                document.getElementById('checkout-method').textContent = data.checkOut.method;
+                document.getElementById('checkout-device').textContent = data.checkOut.deviceName || 'N/A';
+                document.getElementById('checkout-date').textContent = data.checkOut.date;
+                document.getElementById('checkout-notes').textContent = data.checkOut.notes || 'N/A';
+                document.getElementById('checkout-photo').src = data.checkOut.photoUrl;
+                document.getElementById('checkout-lat').textContent = data.checkOut.location.latitude;
+                document.getElementById('checkout-lng').textContent = data.checkOut.location.longtitude;
+                document.getElementById('checkout-ip').textContent = data.checkOut.location.ipAddress;
+            } else {
+                document.getElementById('checkout-method').textContent = 'No presenta';
+                document.getElementById('checkout-device').textContent = 'No presenta';
+                document.getElementById('checkout-date').textContent = 'No presenta';
+                document.getElementById('checkout-notes').textContent = 'No presenta';
+                document.getElementById('checkout-photo').src = '';
+                document.getElementById('checkout-lat').textContent = 'No presenta';
+                document.getElementById('checkout-lng').textContent = 'No presenta';
+                document.getElementById('checkout-ip').textContent = 'No presenta';
+            }
+
+            // Mostrar modal
+            const detailModal = new bootstrap.Modal(document.getElementById('detail-modal'));
+            detailModal.show();
+        },
+        error: (err) => {
+            $.notify({
+                icon: 'icon-bell',
+                title: 'Error',
+                message: 'Ha ocurrido un error inesperado'
+            }, {
+                type: 'danger'
+            });
+        }
+    })
 }
 
 let hasMatch = false;
