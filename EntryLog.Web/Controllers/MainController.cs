@@ -9,19 +9,20 @@ namespace EntryLog.Web.Controllers
     [Authorize(Roles = "Employee")]
     public class MainController(IWorkSessionServices workSessionServices) : Controller
     {
-        public async Task< IActionResult> Index()
+        public IActionResult Index()
         {
-            UserViewModel user = User.GetUserData()!;
-            var lastLocations = await workSessionServices.GetLastLocationsByEmployeeAsync(user.NameIdentifier);
-
             return View();
         }
 
-
-        //[HttpGet("menu/ultimas_locaciones")]
-        //public IActionResult LastEmployeeLocationsAsync()
-        //{
-
-        //}
+        [HttpGet("menu/ultimas_locaciones")]
+        public async Task<JsonResult> LastEmployeeLocationsAsync()
+        {
+            UserViewModel user = User.GetUserData()!;
+            var locations = await workSessionServices.GetLastLocationsByEmployeeAsync(user.NameIdentifier);
+            return Json(new
+            {
+                locations = locations.ToArray()
+            });
+        }
     }
 }

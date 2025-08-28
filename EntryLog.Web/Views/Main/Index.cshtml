@@ -92,8 +92,8 @@
                     <div class="col-md-6">
                         <div class="table-responsive table-hover table-sales">
                             <table class="table">
-                                <tbody>
-                                    <tr>
+                                <tbody id="list-locations">
+                                    @* <tr>
                                         <td>
                                             <div class="flag">
                                                 <img src="~/lib/kaiadmin/assets/img/flags/co.png" alt="colombia">
@@ -101,104 +101,19 @@
                                         </td>
                                         <td>Bogotá, Colombia</td>
                                         <td class="text-end">
-                                            2.320
+                                            lat
                                         </td>
                                         <td class="text-end">
-                                            42.18%
+                                            lng
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="flag">
-                                                <img src="~/lib/kaiadmin/assets/img/flags/co.png" alt="colombia">
-                                            </div>
-                                        </td>
-                                        <td>Bogotá, Colombia</td>
-                                        <td class="text-end">
-                                            2.320
-                                        </td>
-                                        <td class="text-end">
-                                            42.18%
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="flag">
-                                                <img src="~/lib/kaiadmin/assets/img/flags/co.png" alt="colombia">
-                                            </div>
-                                        </td>
-                                        <td>Bogotá, Colombia</td>
-                                        <td class="text-end">
-                                            2.320
-                                        </td>
-                                        <td class="text-end">
-                                            42.18%
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="flag">
-                                                <img src="~/lib/kaiadmin/assets/img/flags/co.png" alt="colombia">
-                                            </div>
-                                        </td>
-                                        <td>Bogotá, Colombia</td>
-                                        <td class="text-end">
-                                            2.320
-                                        </td>
-                                        <td class="text-end">
-                                            42.18%
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="flag">
-                                                <img src="~/lib/kaiadmin/assets/img/flags/co.png" alt="colombia">
-                                            </div>
-                                        </td>
-                                        <td>Bogotá, Colombia</td>
-                                        <td class="text-end">
-                                            2.320
-                                        </td>
-                                        <td class="text-end">
-                                            42.18%
-                                        </td>
-                                    </tr>
-
+                                    </tr> *@
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mapcontainer">
-                            @* <div id="map" class="w-100" style="height: 400px; background-color: transparent;"></div> *@
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12675959.241152383!2d-74.297333!3d4.570868!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f99a4d2373c7d%3A0x50a79fdcf8bc23ad!2sColombia!5e0!3m2!1ses!2sco!4v1693067665265!5m2!1ses!2sco"
-                                    width="600"
-                                    height="450"
-                                    style="border:0; width: 100%;"
-                                    allowfullscreen=""
-                                    loading="lazy"
-                                    referrerpolicy="no-referrer-when-downgrade">
-                            </iframe>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="card-title">Últimas ubicaciones</div>
-                            </div>
-                            <div class="card-body">
-                                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12675959.241152383!2d-74.297333!3d4.570868!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f99a4d2373c7d%3A0x50a79fdcf8bc23ad!2sColombia!5e0!3m2!1ses!2sco!4v1693067665265!5m2!1ses!2sco"
-                                        width="600"
-                                        height="450"
-                                        style="border:0; width: 100%;"
-                                        allowfullscreen=""
-                                        loading="lazy"
-                                        referrerpolicy="no-referrer-when-downgrade">
-                                </iframe>
-                            </div>
+                            <div id="map" class="w-100" style="height: 400px; background-color: transparent;"></div>
                         </div>
                     </div>
                 </div>
@@ -208,67 +123,5 @@
 </div>
 
 @section Scripts {
-    <script>
-            var world_map = new jsVectorMap({
-            selector: "#map",
-            map: "world",
-            zoomOnScroll: false,
-            regionStyle: {
-                hover: {
-                    fill: '#435ebe'
-                }
-            },
-            markers: [
-                {
-                    name: 'Tuluá',
-                    coords: [4.1021524, -76.1981496],
-                    style: {
-                        fill: '#435ebe'
-                    }
-                },
-                {
-                    name: 'United States',
-                    coords: [38.8936708, -77.1546604],
-                    style: {
-                        fill: '#28ab55'
-                    }
-                },
-                {
-                    name: 'Russia',
-                    coords: [55.5807481, 36.825129],
-                    style: {
-                        fill: '#f3616d'
-                    }
-                },
-                {
-                    name: 'China',
-                    coords: [39.9385466, 116.1172735]
-                },
-                {
-                    name: 'United Kingdom',
-                    coords: [51.5285582, -0.2416812]
-                },
-                {
-                    name: 'India',
-                    coords: [26.8851417, 75.6504721]
-                },
-                {
-                    name: 'Australia',
-                    coords: [-35.2813046, 149.124822]
-                },
-                {
-                    name: 'Brazil',
-                    coords: [-22.9140693, -43.5860681]
-                },
-                {
-                    name: 'Egypt',
-                    coords: [26.834955, 26.3823725]
-                },
-            ],
-            onRegionTooltipShow(event, tooltip) {
-                tooltip.css({ backgroundColor: '#435ebe' })
-            }
-        });
-    </script>
-
+    <script src="~/js/main.index.js"></script>
 }

@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/plugins.min.css">
     <link rel="stylesheet" href="~/lib/kaiadmin/assets/css/kaiadmin.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 </head>
 <body>
@@ -198,7 +199,10 @@
 
     <!-- ✅ Librería face-api.js -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-    
+
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

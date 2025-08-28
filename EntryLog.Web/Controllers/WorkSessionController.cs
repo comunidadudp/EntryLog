@@ -46,7 +46,10 @@ namespace EntryLog.Web.Controllers
                     model.Longitude,
                     model.Image,
                     model.Notes,
-                    model.Descriptor));
+                    model.Descriptor,
+                    model.Country,
+                    model.City,
+                    model.Neighbourhood));
 
             return Json(new
             {
@@ -68,7 +71,10 @@ namespace EntryLog.Web.Controllers
                     model.Longitude,
                     model.Image,
                     model.Notes,
-                    model.Descriptor));
+                    model.Descriptor,
+                    model.Country,
+                    model.City,
+                    model.Neighbourhood));
             return Json(new
             {
                 success,

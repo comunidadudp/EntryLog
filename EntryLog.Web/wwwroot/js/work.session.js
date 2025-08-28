@@ -141,6 +141,30 @@ function startCountdown() {
     }, 1000);
 }
 
+
+/**
+ * Realiza reverse geocode mediante latitud y longitud
+ * @param {number} lat Latitud
+ * @param {number} lng Longitud
+ * @returns
+ */
+async function reverseGeocoding(lat, lng) {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+
+    return fetch(url, {
+        headers: {
+            'User-Agent': 'EjemploReverseGeocode/1.0 (tu-email@example.com)'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta de la API');
+        }
+        return response.json();
+    });
+}
+
+
 /**
  * Toma la foto y la dibuja en el elemento canvas. Adicionalmente detiene la transmisión de video
  */
@@ -199,6 +223,8 @@ async function openWorkSession() {
     console.log("LOCATION POST", location);
     console.log(`Ubicación obtenida: Lat=${location.lat}, Lng=${location.lng}, Precisión=${location.accuracy}m`);
 
+    const reverseGeocode = await reverseGeocoding(location.lat, location.lng);
+
     const faceDetection = await faceapi
         .detectSingleFace(snapshotCanvas, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
@@ -222,6 +248,9 @@ async function openWorkSession() {
     const formData = new FormData();
     formData.append("latitude", location.lat);
     formData.append("longitude", location.lng);
+    formData.append("country", reverseGeocode.address.country);
+    formData.append("city", reverseGeocode.address.city);
+    formData.append("neighbourhood", reverseGeocode.address.neighbourhood);
 
     snapshotCanvas.toBlob((blob) => {
 
@@ -381,7 +410,7 @@ function drawSessionContent(data) {
                         ${statusName}
                     </div>
                     <div class="ms-md-auto py-2 py-md-0">
-                        <button onclick="showSessionDetail('@item.Id')" class="btn btn-label-info btn-round btn-sm">
+                        <button onclick="showSessionDetail(${data.id})" class="btn btn-label-info btn-round btn-sm">
                             <span class="btn-label">
                                 <i class="fa fa-eye"></i>
                             </span>
@@ -576,7 +605,7 @@ function showSessionDetail(id) {
             document.getElementById('checkin-notes').textContent = data.checkIn.notes || 'N/A';
             document.getElementById('checkin-photo').src = data.checkIn.photoUrl;
             document.getElementById('checkin-lat').textContent = data.checkIn.location.latitude;
-            document.getElementById('checkin-lng').textContent = data.checkIn.location.longtitude;
+            document.getElementById('checkin-lng').textContent = data.checkIn.location.longitude;
             document.getElementById('checkin-ip').textContent = data.checkIn.location.ipAddress;
 
             // CheckOut (puede ser null)
@@ -587,7 +616,7 @@ function showSessionDetail(id) {
                 document.getElementById('checkout-notes').textContent = data.checkOut.notes || 'N/A';
                 document.getElementById('checkout-photo').src = data.checkOut.photoUrl;
                 document.getElementById('checkout-lat').textContent = data.checkOut.location.latitude;
-                document.getElementById('checkout-lng').textContent = data.checkOut.location.longtitude;
+                document.getElementById('checkout-lng').textContent = data.checkOut.location.longitude;
                 document.getElementById('checkout-ip').textContent = data.checkOut.location.ipAddress;
             } else {
                 document.getElementById('checkout-method').textContent = 'No presenta';
