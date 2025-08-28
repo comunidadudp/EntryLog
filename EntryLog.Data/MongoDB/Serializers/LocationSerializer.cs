@@ -13,6 +13,9 @@ namespace EntryLog.Data.MongoDB.Serializers
                 {
                     cm.MapMember(x => x.Latitude).SetElementName("latitud");
                     cm.MapMember(x => x.Longitude).SetElementName("longitud");
+                    cm.MapMember(x => x.Country).SetElementName("pais");
+                    cm.MapMember(x => x.City).SetElementName("ciudad");
+                    cm.MapMember(x => x.Neighbourhood).SetElementName("barrio");
                     cm.MapMember(x => x.ApproximateAddress)
                          .SetElementName("direccion_aproximada")
                          .SetIgnoreIfNull(true);
