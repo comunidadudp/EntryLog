@@ -83,6 +83,9 @@ namespace EntryLog.Business.Services
                     {
                         Latitude = sessionDTO.Latitude,
                         Longitude = sessionDTO.Longitude,
+                        Country = sessionDTO.Country,
+                        City = sessionDTO.City,
+                        Neighbourhood = sessionDTO.Neighbourhood,
                         IpAddress = _uriService.RemoteIpAddress,
                     },
                     Notes = sessionDTO.Notes,
@@ -142,6 +145,9 @@ namespace EntryLog.Business.Services
             activeSession.CheckOut.Date = DateTime.UtcNow;
             activeSession.CheckOut.Location.Latitude = sessionDTO.Latitude;
             activeSession.CheckOut.Location.Longitude = sessionDTO.Longitude;
+            activeSession.CheckOut.Location.Country = sessionDTO.Country;
+            activeSession.CheckOut.Location.City = sessionDTO.City;
+            activeSession.CheckOut.Location.Neighbourhood = sessionDTO.Neighbourhood;
             activeSession.CheckOut.Location.IpAddress = _uriService.RemoteIpAddress;
             activeSession.CheckOut.PhotoUrl = imageUrl;
             activeSession.CheckOut.Notes = sessionDTO.Notes;
