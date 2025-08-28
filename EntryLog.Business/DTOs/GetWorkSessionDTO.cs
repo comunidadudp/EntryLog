@@ -20,6 +20,9 @@
 
     public record GetLocationDTO(
         string Latitude,
-        string Longtitude,
+        string Longitude,
+        string Country,
+        string City,
+        string Neighbourhood,
         string IpAddress);
 }

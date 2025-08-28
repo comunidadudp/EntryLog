@@ -18,6 +18,9 @@ namespace EntryLog.Business.Mappers
                     new GetLocationDTO(
                         session.CheckIn.Location.Latitude,
                         session.CheckIn.Location.Longitude,
+                        session.CheckIn.Location.Country,
+                        session.CheckIn.Location.City,
+                        session.CheckIn.Location.Neighbourhood,
                         session.CheckIn.Location.IpAddress),
                     session.CheckIn.PhotoUrl,
                     session.CheckIn.Notes),
@@ -28,6 +31,9 @@ namespace EntryLog.Business.Mappers
                     new GetLocationDTO(
                         session.CheckOut.Location.Latitude,
                         session.CheckOut.Location.Longitude,
+                        session.CheckOut.Location.Country,
+                        session.CheckOut.Location.City,
+                        session.CheckOut.Location.Neighbourhood,
                         session.CheckOut.Location.IpAddress),
                     session.CheckOut.PhotoUrl,
                     session.CheckOut.Notes) : null,
