@@ -40,7 +40,7 @@ namespace EntryLog.Web.Controllers
             UserViewModel userData = User.GetUserData()!;
 
             (bool success, string message, GetWorkSessionDTO? data) = await workSessionServices.OpenSessionAsync(
-                new CreateWorkSessionDTO(
+                new OpenSessionDTO(
                     userData.NameIdentifier.ToString(),
                     model.Latitude,
                     model.Longitude,
@@ -64,7 +64,7 @@ namespace EntryLog.Web.Controllers
         {
             UserViewModel userData = User.GetUserData()!;
             (bool success, string message, GetWorkSessionDTO? data) = await workSessionServices.CloseSessionAsync(
-                new CloseWorkSessionDTO(
+                new CloseSessionDTO(
                     model.SessionId,
                     userData.NameIdentifier.ToString(),
                     model.Latitude,

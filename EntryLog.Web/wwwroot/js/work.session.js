@@ -410,7 +410,7 @@ function drawSessionContent(data) {
                         ${statusName}
                     </div>
                     <div class="ms-md-auto py-2 py-md-0">
-                        <button onclick="showSessionDetail(${data.id})" class="btn btn-label-info btn-round btn-sm">
+                        <button onclick="showSessionDetail('${data.id}')" class="btn btn-label-info btn-round btn-sm">
                             <span class="btn-label">
                                 <i class="fa fa-eye"></i>
                             </span>
@@ -679,7 +679,7 @@ let hasMatch = false;
 
         inactiveVideoSectionLoader();
         $("#save-session-button").removeAttr("disabled");
-        $("#save-session-button").text("Abrir");
+        $("#save-session-button").text(workSessionAction === OPEN_ACTION ? 'Abrir' : 'Cerrar');
 
         // Limpia cualquier intervalo anterior
         if (intervalId) {

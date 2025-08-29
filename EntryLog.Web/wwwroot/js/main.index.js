@@ -1,6 +1,9 @@
 ﻿(() => {
     'use strict'
 
+
+    $("#main-link").addClass('active');
+
     // Map
     var map = L.map('map').setView([4.5709, -74.2973], 5);
 
@@ -9,6 +12,11 @@
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
+    loadLastLocations();
+})();
+
+
+function loadLastLocations() {
     $.ajax({
         url: '/menu/ultimas_locaciones',
         type: 'GET',
@@ -16,6 +24,9 @@
         success: (result) => {
 
             let locations = result.locations;
+
+            if (locations != null && locations.length > 0)
+                $("#locations-content").removeClass("invisible");
 
             const tbody = document.getElementById('list-locations');
 
@@ -47,4 +58,4 @@
             console.log("Error: ", err);
         }
     });
-})();
+}

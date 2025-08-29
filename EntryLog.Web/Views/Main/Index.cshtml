@@ -11,76 +11,77 @@
 <div class="row">
     <div class="col-sm-6 col-md-4">
         <div class="card card-stats card-round">
-            <div class="card-body ">
-                <div class="row align-items-center">
-                    <div class="col-icon">
-                        <div class="icon-big text-center icon-warning bubble-shadow-small">
-                            @* <i class="fas fa-shield-alt"></i> *@
-                            <img src="~/assets/icons/face-recognition.svg" width="50" />
+            <a href="/faceid/index">
+                <div class="card-body ">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-warning bubble-shadow-small">
+                                <img src="~/assets/icons/face-recognition.svg" width="50" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col col-stats ms-3 ms-sm-0">
-                        <div class="numbers">
-                            <h4 class="card-title">FaceID</h4>
-                            <p class="card-category">Activar FaceID</p>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <h4 class="card-title">FaceID</h4>
+                                <p class="card-category">Activar FaceID</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
     <div class="col-sm-6 col-md-4">
         <div class="card card-stats card-round">
-            <div class="card-body ">
-                <div class="row align-items-center">
-                    <div class="col-icon">
-                        <div class="icon-big text-center icon-secondary bubble-shadow-small">
-                            @* <i class="fas fa-user"></i> *@
-                            <img src="~/assets/icons/user.svg" width="50" />
+            <a href="/cuenta/miperfil">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-secondary bubble-shadow-small">
+                                <img src="~/assets/icons/user.svg" width="50" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col col-stats ms-3 ms-sm-0">
-                        <div class="numbers">
-                            <h4 class="card-title">Perfil</h4>
-                            <p class="card-category">Ver perfil</p>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <h4 class="card-title">Perfil</h4>
+                                <p class="card-category">Ver perfil</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
     <div class="col-sm-6 col-md-4">
         <div class="card card-stats card-round">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-icon">
-                        <div class="icon-big text-center icon-info bubble-shadow-small">
-                            @* <i class="fas fa-map-marked-alt"></i> *@
-                            <img src="~/assets/icons/locations.svg" width="50" />
+            <a href="/worksession/index">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-info bubble-shadow-small">
+                                <img src="~/assets/icons/locations.svg" width="50" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col col-stats ms-3 ms-sm-0">
-                        <div class="numbers">
-                            <h4 class="card-title">Sesiones</h4>
-                            <p class="card-category">Gestiona tus sesiones</p>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <h4 class="card-title">Sesiones</h4>
+                                <p class="card-category">Gestiona tus sesiones</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </div>
 
-<div class="row">
+<div id="locations-content" class="row invisible">
     <div class="col-md-12">
         <div class="card card-round">
             <div class="card-header">
                 <div class="card-head-row card-tools-still-right">
                     <h4 class="card-title">Geolocalización de usuario</h4>
                     <div class="card-tools">
-                        <button class="btn btn-icon btn-link btn-primary btn-xs"><span class="fa fa-angle-down"></span></button>
-                        <button class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card"><span class="fa fa-sync-alt"></span></button>
-                        <button class="btn btn-icon btn-link btn-primary btn-xs"><span class="fa fa-times"></span></button>
+                        <button onclick="loadLastLocations()" class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card"><span class="fa fa-sync-alt"></span></button>
                     </div>
                 </div>
                 <p class="card-category">
@@ -92,22 +93,7 @@
                     <div class="col-md-6">
                         <div class="table-responsive table-hover table-sales">
                             <table class="table">
-                                <tbody id="list-locations">
-                                    @* <tr>
-                                        <td>
-                                            <div class="flag">
-                                                <img src="~/lib/kaiadmin/assets/img/flags/co.png" alt="colombia">
-                                            </div>
-                                        </td>
-                                        <td>Bogotá, Colombia</td>
-                                        <td class="text-end">
-                                            lat
-                                        </td>
-                                        <td class="text-end">
-                                            lng
-                                        </td>
-                                    </tr> *@
-                                </tbody>
+                                <tbody id="list-locations"></tbody>
                             </table>
                         </div>
                     </div>

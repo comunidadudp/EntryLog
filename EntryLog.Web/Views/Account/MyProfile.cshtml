@@ -1,0 +1,73 @@
+﻿@{
+    Layout = "_MainLayout";
+    ViewBag.Title = "Mi Perfil";
+}
+
+@model UserInfoDTO
+
+<link href="~/css/profile.css" rel="stylesheet" />
+
+@{
+    string image = Model.IsFaceIdActive ? Model.ProfileImage : "https://openclipart.org/download/247319/abstract-user-flat-3.svg";
+}
+
+<!--Encabezado-->
+<div class="profile-header">
+    <h1 class="fw-bold">@Model.Name</h1>
+    <p class="mb-5">@Model.Role</p>
+    <img src="@image" alt="Foto de perfil" class="profile-avatar" />
+</div>
+
+
+<div class="container-fluid mt-5 pt-5">
+    <div class="row g-4">
+
+        @{
+            string status = Model.IsActive ? "bg-success" : "bg-danger";
+            string statusName = Model.IsActive ? "Activo" : "Inactivo";
+        }
+
+        <!--Información Básica-->
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5 class="card-title">Información Básica</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Código:</strong> @Model.Code</li>
+                    <li><strong>Nombre:</strong> @Model.Name</li>
+                    <li><strong>Rol:</strong> @Model.Role</li>
+                    <li><strong>Estado:</strong> <span class="badge @status">@statusName</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!--Información Laboral-->
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5 class="card-title">Información Laboral</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Cargo:</strong> @Model.PositionName</li>
+                    <li><strong>Descripción:</strong> @Model.PositionDescription</li>
+                    <li><strong>Correo:</strong> @Model.Email</li>
+                    <li><strong>Celular:</strong> @Model.CellPhone</li>
+                </ul>
+            </div>
+        </div>
+
+        @{
+            string faceIdStatus = Model.IsFaceIdActive ? "bg-success" : "bg-danger";
+            string faceIdStatusName = Model.IsFaceIdActive ? "Activo" : "Inactivo";
+        }
+
+        <!--Información Extra-->
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5 class="card-title">Información Adicional</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Fecha de Nacimiento:</strong> @Model.DateOfBirthDay</li>
+                    <li><strong>Ciudad de Residencia:</strong> @Model.City</li>
+                    <li><strong>Face ID:</strong> <span class="badge @faceIdStatus">@faceIdStatusName</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
