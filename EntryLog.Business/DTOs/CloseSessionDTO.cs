@@ -2,7 +2,8 @@
 
 namespace EntryLog.Business.DTOs
 {
-    public record CreateWorkSessionDTO(
+    public record CloseSessionDTO(
+        string SessionId,
         string UserId,
         string Latitude,
         string Longitude,

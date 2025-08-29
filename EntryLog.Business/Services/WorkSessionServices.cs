@@ -27,7 +27,7 @@ namespace EntryLog.Business.Services
         private readonly IUriService _uriService = uriService;
 
 
-        public async Task<(bool success, string message, GetWorkSessionDTO? data)> OpenSessionAsync(CreateWorkSessionDTO sessionDTO)
+        public async Task<(bool success, string message, GetWorkSessionDTO? data)> OpenSessionAsync(OpenSessionDTO sessionDTO)
         {
             int code = int.Parse(sessionDTO.UserId);
 
@@ -102,7 +102,7 @@ namespace EntryLog.Business.Services
             return (true, "Sesión abierta exitosamente", WorkSessionMapper.MapToGetWorkSessionDTO(session));
         }
 
-        public async Task<(bool success, string message, GetWorkSessionDTO? data)> CloseSessionAsync(CloseWorkSessionDTO sessionDTO)
+        public async Task<(bool success, string message, GetWorkSessionDTO? data)> CloseSessionAsync(CloseSessionDTO sessionDTO)
         {
             int code = int.Parse(sessionDTO.UserId);
 

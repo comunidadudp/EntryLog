@@ -1,6 +1,7 @@
 ﻿using EntryLog.Business.DTOs;
 using EntryLog.Business.Interfaces;
 using EntryLog.Business.Mailtrap.Models;
+using EntryLog.Business.Mappers;
 using EntryLog.Data.Interfaces;
 using EntryLog.Entities.POCOEntities;
 
@@ -12,7 +13,8 @@ namespace EntryLog.Business.Services
         IPasswordHasherService hasherService,
         IEncryptionService encryptionService,
         IEmailSenderService emailSenderService,
-        IUriService uriService) : IAppUserServices
+        IUriService uriService,
+        IHttpClientFactory httpClientFactory) : IAppUserServices
     {
         private readonly IEmployeeRepository _employeeRepository = employeeRepository;
         private readonly IAppUserRepository _userRepository = userRepository;
@@ -20,6 +22,7 @@ namespace EntryLog.Business.Services
         private readonly IEncryptionService _encryptionService = encryptionService;
         private readonly IEmailSenderService _emailSenderService = emailSenderService;
         private readonly IUriService _uriService = uriService;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
         public async Task<(bool success, string message)> AccountRecoveryCompleteAsync(AccountRecoveryDTO recoveryDTO)
         {
@@ -50,7 +53,7 @@ namespace EntryLog.Business.Services
             AppUser user = await _userRepository.GetByRecoveryTokenAsync(recoveryDTO.Token);
             if (user == null || !string.Equals(username, user.Email, StringComparison.OrdinalIgnoreCase))
                 return (false, "Token inválido");
-                
+
             var tokenDate = DateTime.FromBinary(ticks);
             var now = DateTime.UtcNow;
 
@@ -162,6 +165,39 @@ namespace EntryLog.Business.Services
                 return (false, "Usuario y/o contraseña incorrecta", null);
 
             return (true, "Login successfull", new LoginResponseDTO(user.Code, user.Role.ToString(), user.Email, user.Name));
+        }
+
+        public async Task<UserInfoDTO> GetUserInfoAsync(int code)
+        {
+            AppUser user = await _userRepository.GetByCodeAsync(code);
+            Employee? employee = await _employeeRepository.GetByCodeAsync(code);
+
+            string base64Image = string.Empty;
+
+            if (user?.FaceID is not null)
+            {
+                base64Image = await GenerateBase64PngImageAsync(user.FaceID.ImageURL);
+            }
+
+            return AppUserMapper.MapToUserInfoDTO(user, employee!, base64Image);
+        }
+
+
+        private async Task<string> GenerateBase64PngImageAsync(string imageUrl)
+        {
+            using var client = _httpClientFactory.CreateClient();
+            using var response = await client.GetAsync(imageUrl, HttpCompletionOption.ResponseHeadersRead);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return string.Empty;
+            }
+
+            var contentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
+
+            byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+            var prefix = $"data:{contentType};base64,";
+            return prefix + Convert.ToBase64String(imageBytes);
         }
     }
 }
