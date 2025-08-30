@@ -26,48 +26,20 @@ namespace EntryLog.Business.Services
 
         public async Task<(bool success, string message)> AccountRecoveryCompleteAsync(AccountRecoveryDTO recoveryDTO)
         {
-            if (string.IsNullOrWhiteSpace(recoveryDTO.Token))
-                return (false, "Token inválido");
+            (bool success, string message, AppUser? user) = await ValidateRecoveryTokenInternalAsync(recoveryDTO.Token);
 
-            string recoveryTokenPlain;
+            if (!success && user is null)
+                return (success, message);
 
-            try
+            if (success)
             {
-                recoveryTokenPlain = _encryptionService.Decrypt(recoveryDTO.Token);
-            }
-            catch
-            {
-                return (false, "Token inválido");
-            }
-
-            if (string.IsNullOrEmpty(recoveryTokenPlain) || !recoveryTokenPlain.Contains(':'))
-                return (false, "Token inválido");
-
-            string[] parts = recoveryTokenPlain.Split(':');
-
-            if (parts.Length != 2 || !long.TryParse(parts[0], out long ticks))
-                return (false, "Token inválido");
-
-            string username = parts[1];
-
-            AppUser user = await _userRepository.GetByRecoveryTokenAsync(recoveryDTO.Token);
-            if (user == null || !string.Equals(username, user.Email, StringComparison.OrdinalIgnoreCase))
-                return (false, "Token inválido");
-
-            var tokenDate = DateTime.FromBinary(ticks);
-            var now = DateTime.UtcNow;
-
-            const int expirationMinutes = 30;
-
-            if ((now - tokenDate).TotalMinutes <= expirationMinutes)
-            {
-                user.Password = _hasherService.Hash(recoveryDTO.Password);
+                user!.Password = _hasherService.Hash(recoveryDTO.Password);
                 await FinalizeRecovery(user);
                 return (true, "Contraseña actualizada correctamente");
             }
             else
             {
-                await FinalizeRecovery(user);
+                await FinalizeRecovery(user!);
                 return (false, "Token vencido");
             }
         }
@@ -101,7 +73,7 @@ namespace EntryLog.Business.Services
             var vars = new RecoveryAccountVariables
             {
                 Name = user.Name,
-                Url = $"{_uriService.ApplicationURL}/account/recovery?token={recoveryToken}"
+                Url = $"{_uriService.ApplicationURL}/cuenta/completar_recuperar?token={Uri.EscapeDataString(recoveryToken)}"
             };
 
             bool isSend = await _emailSenderService.SendEmailWithTemplateAsync("RecoveryToken", user.Email, vars);
@@ -198,6 +170,58 @@ namespace EntryLog.Business.Services
             byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
             var prefix = $"data:{contentType};base64,";
             return prefix + Convert.ToBase64String(imageBytes);
+        }
+
+        public async Task<(bool success, string message)> ValidateRecoveryTokenAsync(string token)
+        {
+            (bool success, string message, AppUser? _) = await ValidateRecoveryTokenInternalAsync(token);
+            return (success, message);
+        }
+
+        private async Task<(bool success, string message, AppUser? user)> 
+            ValidateRecoveryTokenInternalAsync(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return (false, "Token inválido", null);
+
+            string recoveryTokenPlain;
+
+            try
+            {
+                recoveryTokenPlain = _encryptionService.Decrypt(token);
+            }
+            catch
+            {
+                return (false, "Token inválido", null);
+            }
+
+            if (string.IsNullOrEmpty(recoveryTokenPlain) || !recoveryTokenPlain.Contains(':'))
+                return (false, "Token inválido", null);
+
+            string[] parts = recoveryTokenPlain.Split(':');
+
+            if (parts.Length != 2 || !long.TryParse(parts[0], out long ticks))
+                return (false, "Token inválido", null);
+
+            string username = parts[1];
+
+            AppUser user = await _userRepository.GetByRecoveryTokenAsync(token);
+            if (user == null || !string.Equals(username, user.Email, StringComparison.OrdinalIgnoreCase))
+                return (false, "Token inválido", null);
+
+            var tokenDate = DateTime.FromBinary(ticks);
+            var now = DateTime.UtcNow;
+
+            const int expirationMinutes = 30;
+
+            if ((now - tokenDate).TotalMinutes <= expirationMinutes)
+            {
+                return (true, "Token válido", user!);
+            }
+            else
+            {
+                return (false, "Token vencido", user!);
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ namespace EntryLog.Business.Interfaces
         Task<(bool success, string message, LoginResponseDTO? data)> UserLoginAsync(UserCredentialsDTO credentialsDTO);
         Task<(bool success, string message)> AccountRecoveryStartAsync(string username);
         Task<(bool success, string message)> AccountRecoveryCompleteAsync(AccountRecoveryDTO recoveryDTO);
+        Task<(bool success, string message)> ValidateRecoveryTokenAsync(string token);
         Task<UserInfoDTO> GetUserInfoAsync(int code);
     }
 }
