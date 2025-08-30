@@ -9,7 +9,7 @@
 
     // Capa base
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     loadLastLocations();
@@ -24,6 +24,8 @@ function loadLastLocations() {
         success: (result) => {
 
             let locations = result.locations;
+
+            console.log("locations ", locations);
 
             if (locations != null && locations.length > 0)
                 $("#locations-content").removeClass("invisible");

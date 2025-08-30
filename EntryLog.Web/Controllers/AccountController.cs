@@ -108,5 +108,42 @@ namespace EntryLog.Web.Controllers
             await HttpContext.SignOutCookiesAsync();
             return RedirectToAction("Login");
         }
+
+        [HttpGet("cuenta/recuperar", Name = "GetRecover")]
+        public IActionResult Recover()
+        {
+            return View();
+        }
+
+        [HttpPost("cuenta/recuperar", Name = "PostRecover")]
+        public async Task<JsonResult> RecoverAsync(string email)
+        {
+            (bool success, string message) = await userServices.AccountRecoveryStartAsync(email);
+            return Json(new
+            {
+                success,
+                message
+            });
+        }
+
+        [HttpGet("cuenta/completar_recuperar", Name = "GetCompleteRecover")]
+        public async Task<IActionResult> CompleteRecover([FromQuery] string token)
+        {
+            (bool success, string message) = await userServices.ValidateRecoveryTokenAsync(token);
+            ViewBag.Success = success;
+            ViewBag.Message = message;
+            return View();
+        }
+
+        [HttpPost("cuenta/completar_recuperar", Name = "PostCompleteRecover")]
+        public async Task<JsonResult> CompleteRecoverAsync(AccountRecoveryDTO model)
+        {
+            (bool success, string message) = await userServices.AccountRecoveryCompleteAsync(model);
+            return Json(new
+            {
+                success,
+                message
+            });
+        }
     }
 }
